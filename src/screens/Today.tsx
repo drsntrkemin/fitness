@@ -9,6 +9,7 @@ import { exercisesFor, nextDay } from '../domain/program';
 import { buildClaudeSummary } from '../domain/summary';
 import type { DayKey, Macros, Settings } from '../domain/types';
 import { copyText, isStandalone } from '../platform/ios';
+import { useToday } from '../hooks/useToday';
 
 interface Props {
   settings: Settings;
@@ -31,7 +32,7 @@ const HINT_KEY = 'ev-fitness:install-hint-dismissed';
 const readHintDismissed = () => { try { return localStorage.getItem(HINT_KEY) === '1'; } catch { return false; } };
 
 export default function Today({ settings, onOpenSettings, onStartWorkout, onContinueWorkout }: Props) {
-  const today = localDateKey(new Date());
+  const today = useToday();
   const [data, setData] = useState<Data | null>(null);
   const [adding, setAdding] = useState(false);
   const [copied, setCopied] = useState<null | 'ok' | 'failed'>(null);
@@ -117,7 +118,7 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onCont
         <button type="button" className="btn btn-primary btn-block add-meal" onClick={() => setAdding(true)}>+ Öğün ekle</button>
       )}
 
-      {data.needsMeasurement && <MeasurementCard today={today} onSaved={load} />}
+      {data.needsMeasurement && <MeasurementCard onSaved={load} />}
 
       {backupDue && (
         <button type="button" className="backup-nudge" onClick={onOpenSettings}>
@@ -145,7 +146,7 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onCont
   );
 }
 
-function MeasurementCard({ today, onSaved }: { today: string; onSaved: () => void }) {
+function MeasurementCard({ onSaved }: { onSaved: () => void }) {
   const [weight, setWeight] = useState('');
   const [waist, setWaist] = useState('');
   const w = weight.trim() === '' ? null : parseDecimal(weight);
@@ -170,7 +171,11 @@ function MeasurementCard({ today, onSaved }: { today: string; onSaved: () => voi
       </div>
       <div className="actions">
         <button type="button" className="btn btn-primary" disabled={!canSave}
-          onClick={async () => { await repo.putMeasurement({ date: today, weight: w, waist: b }); onSaved(); }}>
+          onClick={async () => {
+            // Tarih kaydetme anında alınır (kart gece yarısından önce açılmış olabilir).
+            await repo.putMeasurement({ date: localDateKey(new Date()), weight: w, waist: b });
+            onSaved();
+          }}>
           Ölçümü kaydet
         </button>
       </div>

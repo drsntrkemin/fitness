@@ -2,15 +2,16 @@ import { useEffect, useState } from 'react';
 import LineChart from '../components/LineChart';
 import * as repo from '../data/repo';
 import { EXERCISES } from '../domain/catalog';
-import { addDays, formatDay, localDateKey } from '../domain/dates';
+import { addDays, formatDay } from '../domain/dates';
 import { num, signed } from '../domain/format';
 import { averages } from '../domain/nutrition';
 import type { Meal, Measurement, Session, Settings } from '../domain/types';
+import { useToday } from '../hooks/useToday';
 
 interface Data { meals: Meal[]; measurements: Measurement[]; sessions: Session[] }
 
 export default function Progress({ settings }: { settings: Settings }) {
-  const today = localDateKey(new Date());
+  const today = useToday();
   const [data, setData] = useState<Data | null>(null);
   const [period, setPeriod] = useState<7 | 30>(7);
   const [open, setOpen] = useState<string | null>(null);

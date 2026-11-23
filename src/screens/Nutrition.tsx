@@ -1,15 +1,25 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import MealForm from '../components/MealForm';
 import ProgressBar from '../components/ProgressBar';
 import { listMeals } from '../data/repo';
-import { addDays, formatDay, localDateKey } from '../domain/dates';
+import { addDays, formatDay } from '../domain/dates';
 import { num } from '../domain/format';
 import { dayTotals } from '../domain/nutrition';
 import type { Meal, Settings } from '../domain/types';
+import { useToday } from '../hooks/useToday';
 
 export default function Nutrition({ settings }: { settings: Settings }) {
-  const today = localDateKey(new Date());
+  const today = useToday();
   const [date, setDate] = useState(today);
+  // Gün değişince (gece yarısı): "bugün" seçiliyse yeni güne geç; geçmiş bir gün seçiliyse dokunma.
+  const prevToday = useRef(today);
+  useEffect(() => {
+    const previous = prevToday.current;
+    if (previous !== today) {
+      setDate((d) => (d === previous ? today : d));
+      prevToday.current = today;
+    }
+  }, [today]);
   const [meals, setMeals] = useState<Meal[] | null>(null);
   const [form, setForm] = useState<null | { meal?: Meal }>(null);
 
