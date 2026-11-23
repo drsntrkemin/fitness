@@ -227,3 +227,14 @@ select {
 .pbar.small .pbar-head { flex-direction: column; align-items: flex-start; gap: 0; margin-bottom: 4px; }
 .pbar.small .pbar-label { font-size: 0.8rem; color: var(--muted); }
 .pbar.small .pbar-value { color: var(--text); font-weight: 600; }
+
+/* ── Bugün ── */
+.date-title { font-size: 1.45rem; }
+.workout-card h2 { font-size: 1.15rem; margin-bottom: 0; }
+.week-count { margin: 10px 0 0; text-align: center; }
+.install-hint { display: flex; align-items: center; gap: 8px; background: var(--accent-soft); border-radius: 12px; padding: 8px 4px 8px 12px; margin-bottom: 12px; font-size: 0.88rem; }
+.backup-nudge { display: block; width: 100%; min-height: 44px; margin-bottom: 16px; border: 1px dashed var(--border); border-radius: 12px; background: none; color: var(--accent); font-weight: 600; cursor: pointer; }
+.ask-card .btn { border-color: var(--accent); color: var(--accent); }
+.ask-card .notice { margin: 8px 0 0; }
+.ask-card a { color: inherit; font-weight: 700; }
+.summary-box { width: 100%; font: inherit; font-size: 0.8rem; margin-top: 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }

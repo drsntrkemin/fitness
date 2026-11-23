@@ -3,9 +3,10 @@ import TabBar, { type Tab } from './components/TabBar';
 import { getSettings } from './data/repo';
 import type { Settings } from './domain/types';
 import { requestPersist } from './platform/ios';
-import SettingsScreen from './screens/Settings';
 import Nutrition from './screens/Nutrition';
+import SettingsScreen from './screens/Settings';
 import Setup from './screens/Setup';
+import Today from './screens/Today';
 import Workout from './screens/Workout';
 
 const TITLES: Record<Tab, string> = { today: 'Bugün', workout: 'Antrenman', nutrition: 'Beslenme', progress: 'İlerleme' };
@@ -13,6 +14,7 @@ const TITLES: Record<Tab, string> = { today: 'Bugün', workout: 'Antrenman', nut
 export default function App() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [tab, setTab] = useState<Tab>('today');
+  const [autoStart, setAutoStart] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   const reload = useCallback(async () => {
@@ -26,27 +28,30 @@ export default function App() {
     requestPersist();
   }, [reload]);
 
+  const go = (t: Tab, start = false) => {
+    setAutoStart(start);
+    setTab(t);
+    window.scrollTo?.(0, 0);
+  };
+
   if (!settings) return <div className="app" aria-busy="true" />;
   if (!settings.setupDone) return <Setup onDone={reload} />;
   if (showSettings) return <SettingsScreen settings={settings} onChange={reload} onClose={() => setShowSettings(false)} />;
 
   return (
     <div className="app">
-      {tab === 'workout' ? (
-        <Workout settings={settings} />
-      ) : tab === 'nutrition' ? (
-        <Nutrition settings={settings} />
-      ) : (
+      {tab === 'today' && (
+        <Today settings={settings} onOpenSettings={() => setShowSettings(true)}
+          onStartWorkout={() => go('workout', true)} onContinueWorkout={() => go('workout')} />
+      )}
+      {tab === 'workout' && <Workout settings={settings} autoStart={autoStart} />}
+      {tab === 'nutrition' && <Nutrition settings={settings} />}
+      {tab === 'progress' && (
         <main className="screen">
-          <header className="screen-header">
-            <h1>{TITLES[tab]}</h1>
-            {tab === 'today' && (
-              <button type="button" className="icon-btn" aria-label="Ayarlar" onClick={() => setShowSettings(true)}>⚙</button>
-            )}
-          </header>
+          <header className="screen-header"><h1>{TITLES.progress}</h1></header>
         </main>
       )}
-      <TabBar tab={tab} onChange={setTab} />
+      <TabBar tab={tab} onChange={(t) => go(t)} />
     </div>
   );
 }

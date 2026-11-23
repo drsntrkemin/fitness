@@ -30,3 +30,9 @@ export function formatDay(key: DateKey, opts: { long?: boolean } = {}): string {
     ? { day: 'numeric', month: 'long', weekday: 'long' }
     : { day: 'numeric', month: 'short', weekday: 'short' });
 }
+
+/** Gün anahtarının içinde bulunduğu haftanın Pazartesi günü. */
+export function weekStart(key: DateKey): DateKey {
+  const dow = toNoon(key).getDay(); // 0 = Pazar
+  return addDays(key, -((dow + 6) % 7));
+}

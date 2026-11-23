@@ -29,3 +29,11 @@ test('formatDay tarihi Türkçe kısa biçimde yazar', async () => {
   expect(formatDay('2026-11-20')).toBe('20 Kas Cum');
   expect(formatDay('2026-11-23', { long: true })).toBe('23 Kasım Pazartesi');
 });
+
+test('weekStart haftanın Pazartesi gününü verir', async () => {
+  const { weekStart } = await import('../../src/domain/dates');
+  expect(weekStart('2026-11-23')).toBe('2026-11-23'); // Pazartesi
+  expect(weekStart('2026-11-29')).toBe('2026-11-23'); // Pazar
+  expect(weekStart('2026-11-25')).toBe('2026-11-23'); // Çarşamba
+  expect(weekStart('2026-03-01')).toBe('2026-02-23'); // Pazar, ay sınırı
+});
