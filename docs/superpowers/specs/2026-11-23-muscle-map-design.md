@@ -1,6 +1,6 @@
 # Kas Haritası — Kısa Tasarım
 
-Tarih: 2026-11-23 · Durum: Onay bekliyor · Ana tasarım: `2026-11-23-fitness-app-design.md`
+Tarih: 2026-11-23 · Durum: Onaylandı (kullanıcı: "2 kez kontrol ettikten sonra yapmaya başla") · Ana tasarım: `2026-11-23-fitness-app-design.md`
 
 ## Amaç
 Kullanıcı uygulamanın daha görsel ve **motive edici** olmasını, hareketlerin hangi kasları çalıştırdığının resimle
@@ -14,8 +14,8 @@ görünmesini istiyor. Hedefi "kaslı ve şekilli" görünmek; hangi kasın çal
 
 ## Tasarım
 - **Figür:** Uygulama içinde çizilen sade ön/arka vücut (SVG). İnternetsiz çalışır, açık/koyu temaya uyar.
-  16 bölge: omuz, göğüs, biceps, ön kol, karın, yan karın, ön bacak, baldır (ön görünüm); trapez, arka omuz, üst sırt,
-  kanat, bel, triceps, kalça, arka bacak (arka görünüm; ön kol ve baldır arkada da görünür).
+  Ön görünüm: omuz, göğüs, biceps, ön kol, karın, yan karın, ön bacak. Arka görünüm: trapez, arka omuz, üst sırt,
+  kanat, bel, triceps, ön kol, kalça, arka bacak, baldır. Baldır yalnız arkada çizilir (anatomik olarak arka bacaktadır).
   **Turuncu** = ana kas, **açık turuncu** = yardımcı kas, gri = çalışmıyor.
 - **Antrenman ekranı (aktif):** En üstte yeşil degrade kart: "Bugün çalışacak kasların 🔥", "N hareket · tüm vücut",
   büyük ön/arka figür (günün tüm hareketlerinin birleşimi), ana kas etiketleri. Her hareket kartında adın altında ana
@@ -42,9 +42,23 @@ görünmesini istiyor. Hedefi "kaslı ve şekilli" görünmek; hangi kasın çal
 | Bantlı omuz press | Omuz | Triceps, Trapez |
 | Geri lunge | Ön bacak, Kalça | Arka bacak, Baldır |
 | Bantlı hip thrust | Kalça | Arka bacak |
-| Bantlı Pallof press | Karın, Yan karın | — |
+| Bantlı Pallof press | Yan karın, Karın | — |
 | Bantlı göğüs fly | Göğüs | Omuz |
 | Bantlı triceps pushdown | Triceps | — |
+
+## İki kez kontrol sonucu alınan kararlar
+1. *Anatomi:* Eşleşmeler hareket bilimiyle uyumlu. Düzeltmeler: baldır yalnız arka figürde (örnekte ön alt bacakta
+   yanıyordu); Pallof press'te yan karın önce.
+2. *Veri:* Kaslar katalogdaki her harekete `muscles: { primary, secondary }` olarak eklenir. Her hareketin en az bir
+   ana kası olmalı, kas adları sabit listeden (test bunu zorlar).
+3. *Günün kasları:* Ana = günün tüm hareketlerinin ana kaslarının birleşimi; yardımcı = yardımcıların birleşimi eksi ana.
+   Etiket sırası katalogdaki sıraya göre (ilk geçtiği yer).
+4. *Bitiş özeti:* "N set" = girilen (boş olmayan) set sayısı; "M hareket ilerledi" = tekrarı artan ya da seviye atlayan
+   hareket sayısı ("en üst seviye" ilerleme sayılmaz).
+5. *Bugün ekranı, antrenman devam ederken:* kart "Antrenman devam ediyor" der ve o oturumun gününün kaslarını gösterir.
+6. *Boyutlar:* Antrenman başı figür ~190 px, bitiş ~150 px, Bugün/Sıradaki kartı ~90 px (yazı solda, figür sağda).
+7. *Renk:* Figür yeşil degrade üzerinde yarı saydam beyaz zemin, turuncu ana / açık turuncu yardımcı; aynı renkler açık
+   ve koyu temada kullanılır (degrade iki temada da aynı). Kart etiketlerinde ana kas turuncu, yardımcı gri.
 
 ## Hedef olmayanlar
 Hareketin nasıl yapıldığını gösteren çizimler ya da fotoğraflar; kas başına haftalık hacim istatistiği; animasyon.
