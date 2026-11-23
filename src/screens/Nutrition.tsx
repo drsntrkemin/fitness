@@ -14,7 +14,13 @@ export default function Nutrition({ settings }: { settings: Settings }) {
   const [form, setForm] = useState<null | { meal?: Meal }>(null);
 
   const load = useCallback(async () => setMeals(await listMeals(date, date)), [date]);
-  useEffect(() => { load(); }, [load]);
+  // Gün değişince eski günün listesini gösterme; geç gelen eski cevabı yok say.
+  useEffect(() => {
+    let alive = true;
+    setMeals(null);
+    listMeals(date, date).then((m) => { if (alive) setMeals(m); });
+    return () => { alive = false; };
+  }, [date]);
 
   const dayLabel = date === today ? 'Bugün' : date === addDays(today, -1) ? 'Dün' : formatDay(date);
   const t = dayTotals(meals ?? []);
@@ -49,11 +55,13 @@ export default function Nutrition({ settings }: { settings: Settings }) {
 
       <section className="card">
         <h3 className="group-title">Öğünler</h3>
-        {meals && meals.length === 0 ? (
+        {meals === null ? (
+          <p className="muted" aria-busy="true">Yükleniyor…</p>
+        ) : meals.length === 0 ? (
           <p className="muted">Bu gün için öğün yok.</p>
         ) : (
           <ul className="list" aria-label="Öğünler">
-            {(meals ?? []).map((m) => (
+            {meals.map((m) => (
               <li key={m.id}>
                 <button type="button" className="meal-row" onClick={() => setForm({ meal: m })}>
                   <span className="meal-time">{m.time}</span>

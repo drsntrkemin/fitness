@@ -82,10 +82,10 @@ test('gün seçici önceki güne gider; bugünden ileri gidilemez', async () => 
   render(<Nutrition settings={settings} />);
   expect(await screen.findByText('Bugün')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Sonraki gün' })).toBeDisabled();
-  expect(screen.getByText('Bu gün için öğün yok.')).toBeInTheDocument();
+  expect(await screen.findByText('Bu gün için öğün yok.')).toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: 'Önceki gün' }));
   expect(await screen.findByText('Dün')).toBeInTheDocument();
-  expect(within(screen.getByRole('list', { name: 'Öğünler' })).getByText('Yulaf')).toBeInTheDocument();
+  expect(within(await screen.findByRole('list', { name: 'Öğünler' })).getByText('Yulaf')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Sonraki gün' })).toBeEnabled();
 });
 
