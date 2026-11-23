@@ -42,3 +42,13 @@ export interface ExerciseOverride {
   repMax?: number;
   sets?: number;
 }
+
+/** Bir hareketin koç durumu: merdivendeki seviye ve bir sonraki oturumun hedef tekrarı. */
+export interface ExerciseState {
+  level: number;
+  targetReps: number;
+  /** Üst üste kaç oturumda bir set alt sınırın altında kaldı. */
+  failStreak: number;
+}
+
+export type ProgressEvent = 'none' | 'reps-up' | 'level-up' | 'level-down' | 'max-level' | 'skipped';
