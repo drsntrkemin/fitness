@@ -1,7 +1,7 @@
 # Ev Fitness Uygulaması — Tasarım Belgesi
 
 Tarih: 2026-11-23
-Durum: Taslak (onay bekliyor)
+Durum: Onaylandı
 
 ## 1. Amaç ve neden
 
@@ -58,7 +58,7 @@ Antrenmanda "bugün ne yapacağım, hangi bantla, kaç tekrar" sorusunun cevabı
 - **Maliyet:** Sıfır. Sunucu yok, ücretli servis yok.
 - **Veri:** Tamamen cihazda (IndexedDB). Ağ bağlantısı gerekmez.
 - **Dil:** Arayüz Türkçe.
-- **Repo:** `drsntrkemin/fitness` (private). Yayınlama yöntemi bu kısıta göre seçilmeli (bkz. §8, açık soru).
+- **Repo:** `drsntrkemin/fitness`. Yayınlama: GitHub Pages (bkz. §8).
 
 ## 4. Değerlendirilen yaklaşımlar
 
@@ -264,8 +264,9 @@ sırasında taşıma (migration) yapılabilsin diye.
 - Uygulama ikonu.
 - Hareket açıklamaları (her hareket için 1-2 cümlelik "nasıl yapılır" notu). İçerik builder tarafından yazılır.
 
-## 8. Açık sorular
+## 8. Yayınlama
 
-- **Yayınlama:** Repo private. GitHub Pages private repoda ücretli plan gerektiriyor. Seçenekler:
-  (a) repoyu public yapmak (kodda kişisel veri yok, veriler telefonda), (b) Netlify / Cloudflare Pages gibi
-  ücretsiz bir servise bağlamak (kullanıcının bir hesap açması gerekir). Kullanıcı kararı bekleniyor.
+Kullanıcının kararı: repo **public** yapılacak (kodda kişisel veri yok, tüm veriler telefonda).
+Uygulama **GitHub Pages** üzerinden, GitHub Actions ile otomatik derlenip yayınlanır.
+Repoyu public yapmak ve Pages kaynağını "GitHub Actions" olarak seçmek kullanıcının GitHub ayarlarında
+yapacağı tek seferlik bir adımdır.
