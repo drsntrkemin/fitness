@@ -260,3 +260,10 @@ select {
 .history-row { display: flex; align-items: baseline; gap: 10px; padding: 4px 0; font-size: 0.9rem; }
 .history-row .muted { min-width: 76px; }
 .history-sets { font-weight: 700; font-variant-numeric: tabular-nums; }
+.measure-item { border-bottom: 1px solid var(--border); }
+.measure-item:last-child { border-bottom: 0; }
+.measure-row { display: flex; align-items: center; gap: 8px; }
+.measure-date { min-width: 76px; }
+.measure-values { display: flex; flex-wrap: wrap; gap: 0 10px; font-weight: 600; }
+.link-btn.danger { color: var(--danger); }
+.measure-form { padding: 4px 0 8px; }

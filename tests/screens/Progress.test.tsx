@@ -74,3 +74,30 @@ test('geçmişi olmayan hareket bunu söyler', async () => {
   await user.click(await screen.findByRole('button', { name: 'Şınav' }));
   expect(screen.getByText('Bu hareket henüz kaydedilmedi.')).toBeInTheDocument();
 });
+
+test('ölçüm listeden silinebilir', async () => {
+  const user = userEvent.setup();
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+  await repo.putMeasurement({ date: addDays(today, -7), weight: 80, waist: 92 });
+  await repo.putMeasurement({ date: today, weight: 785, waist: null });
+  render(<Progress settings={settings} />);
+  const list = await screen.findByRole('list', { name: 'Ölçümler' });
+  const row = within(list).getByText('785 kg').closest('li')!;
+  await user.click(within(row).getByRole('button', { name: 'Sil' }));
+  await vi.waitFor(async () => expect(await repo.listMeasurements()).toHaveLength(1));
+  expect(screen.queryByText('785 kg')).not.toBeInTheDocument();
+});
+
+test('ölçüm listeden düzeltilebilir', async () => {
+  const user = userEvent.setup();
+  await repo.putMeasurement({ date: today, weight: 785, waist: null });
+  render(<Progress settings={settings} />);
+  const list = await screen.findByRole('list', { name: 'Ölçümler' });
+  await user.click(within(list).getByRole('button', { name: 'Düzelt' }));
+  const kilo = within(list).getByLabelText('Kilo (kg)');
+  await user.clear(kilo);
+  await user.type(kilo, '78,5');
+  await user.click(within(list).getByRole('button', { name: 'Kaydet' }));
+  await vi.waitFor(async () => expect(await repo.listMeasurements()).toEqual([{ date: today, weight: 78.5, waist: null }]));
+  expect(await within(list).findByText('78,5 kg')).toBeInTheDocument();
+});

@@ -131,6 +131,10 @@ export async function putMeasurement(m: Measurement): Promise<void> {
   await db.measurements.put(m);
 }
 
+export async function deleteMeasurement(date: DateKey): Promise<void> {
+  await db.measurements.delete(date);
+}
+
 export async function listMeasurements(): Promise<Measurement[]> {
   return db.measurements.orderBy('date').toArray();
 }

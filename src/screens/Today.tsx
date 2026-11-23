@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import MealForm from '../components/MealForm';
+import MeasurementForm from '../components/MeasurementForm';
 import ProgressBar from '../components/ProgressBar';
 import * as repo from '../data/repo';
 import { daysBetween, formatDay, localDateKey, weekStart } from '../domain/dates';
 import { dayTotals } from '../domain/nutrition';
-import { parseDecimal } from '../domain/parse';
 import { exercisesFor, nextDay } from '../domain/program';
 import { buildClaudeSummary } from '../domain/summary';
 import type { DayKey, Macros, Settings } from '../domain/types';
@@ -147,38 +147,15 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onCont
 }
 
 function MeasurementCard({ onSaved }: { onSaved: () => void }) {
-  const [weight, setWeight] = useState('');
-  const [waist, setWaist] = useState('');
-  const w = weight.trim() === '' ? null : parseDecimal(weight);
-  const b = waist.trim() === '' ? null : parseDecimal(waist);
-  const wBad = weight.trim() !== '' && w === null;
-  const bBad = waist.trim() !== '' && b === null;
-  const canSave = !wBad && !bBad && (w !== null || b !== null);
-
   return (
     <section className="card">
       <h2>Haftalık ölçüm</h2>
       <p className="muted small">Haftada bir, tercihen sabah aç karnına. Bel ölçüsü göbek hizasından.</p>
-      <div className="grid-2">
-        <label className="field">
-          <span>Kilo (kg)</span>
-          <input inputMode="decimal" value={weight} aria-invalid={wBad || undefined} onChange={(e) => setWeight(e.target.value)} />
-        </label>
-        <label className="field">
-          <span>Bel (cm)</span>
-          <input inputMode="decimal" value={waist} aria-invalid={bBad || undefined} onChange={(e) => setWaist(e.target.value)} />
-        </label>
-      </div>
-      <div className="actions">
-        <button type="button" className="btn btn-primary" disabled={!canSave}
-          onClick={async () => {
-            // Tarih kaydetme anında alınır (kart gece yarısından önce açılmış olabilir).
-            await repo.putMeasurement({ date: localDateKey(new Date()), weight: w, waist: b });
-            onSaved();
-          }}>
-          Ölçümü kaydet
-        </button>
-      </div>
+      <MeasurementForm submitLabel="Ölçümü kaydet" onSubmit={async (weight, waist) => {
+        // Tarih kaydetme anında alınır (kart gece yarısından önce açılmış olabilir).
+        await repo.putMeasurement({ date: localDateKey(new Date()), weight, waist });
+        onSaved();
+      }} />
     </section>
   );
 }

@@ -51,6 +51,15 @@ describe('haftalık ölçüm kartı', () => {
   });
 });
 
+test('akla yatkın olmayan kilo kaydedilemez ve uyarı gösterilir', async () => {
+  const user = userEvent.setup();
+  renderToday();
+  await screen.findByRole('heading', { name: 'Haftalık ölçüm' });
+  await user.type(screen.getByLabelText('Kilo (kg)'), '785');
+  expect(screen.getByText('Kilo 25–300 kg arasında olmalı.')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Ölçümü kaydet' })).toBeDisabled();
+});
+
 describe('Claude\'a sor', () => {
   test('özeti panoya kopyalar ve claude.ai bağlantısını gösterir', async () => {
     const user = userEvent.setup();

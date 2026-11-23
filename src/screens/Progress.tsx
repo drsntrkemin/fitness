@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import LineChart from '../components/LineChart';
+import MeasurementForm from '../components/MeasurementForm';
 import * as repo from '../data/repo';
 import { EXERCISES } from '../domain/catalog';
 import { addDays, formatDay } from '../domain/dates';
@@ -16,13 +17,18 @@ export default function Progress({ settings }: { settings: Settings }) {
   const [period, setPeriod] = useState<7 | 30>(7);
   const [open, setOpen] = useState<string | null>(null);
 
-  useEffect(() => {
-    let alive = true;
-    Promise.all([repo.allMeals(), repo.listMeasurements(), repo.listSessions()]).then(([meals, measurements, sessions]) => {
-      if (alive) setData({ meals, measurements, sessions });
-    });
-    return () => { alive = false; };
-  }, []);
+  const [editing, setEditing] = useState<string | null>(null);
+  const load = async () => {
+    const [meals, measurements, sessions] = await Promise.all([repo.allMeals(), repo.listMeasurements(), repo.listSessions()]);
+    setData({ meals, measurements, sessions });
+  };
+  useEffect(() => { load(); }, []);
+
+  const remove = async (date: string) => {
+    if (!window.confirm(`${formatDay(date)} ölçümü silinsin mi?`)) return;
+    await repo.deleteMeasurement(date);
+    await load();
+  };
 
   if (!data) return <main className="screen" aria-busy="true" />;
 
@@ -45,6 +51,31 @@ export default function Progress({ settings }: { settings: Settings }) {
 
       <MeasureCard title="Kilo" unit="kg" points={series('weight')} />
       <MeasureCard title="Bel" unit="cm" points={series('waist')} />
+
+      {data.measurements.length > 0 && (
+        <section className="card">
+          <h2>Ölçümler</h2>
+          <ul className="list" aria-label="Ölçümler">
+            {[...data.measurements].reverse().map((m) => (
+              <li key={m.date} className="measure-item">
+                <div className="measure-row">
+                  <span className="muted small measure-date">{formatDay(m.date)}</span>
+                  <span className="grow measure-values">
+                    {m.weight !== null && <span>{`${num(m.weight)} kg`}</span>}
+                    {m.waist !== null && <span className="muted">{`bel ${num(m.waist)} cm`}</span>}
+                  </span>
+                  <button type="button" className="link-btn" onClick={() => setEditing(editing === m.date ? null : m.date)}>Düzelt</button>
+                  <button type="button" className="link-btn danger" onClick={() => remove(m.date)}>Sil</button>
+                </div>
+                {editing === m.date && (
+                  <MeasurementForm initial={m} submitLabel="Kaydet" onCancel={() => setEditing(null)}
+                    onSubmit={async (weight, waist) => { await repo.putMeasurement({ date: m.date, weight, waist }); setEditing(null); await load(); }} />
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="card">
         <h2>Beslenme ortalaması</h2>
