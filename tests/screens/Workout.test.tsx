@@ -228,3 +228,17 @@ describe('kas haritası', () => {
     expect(within(card).getByRole('button', { name: 'Başla' })).toBeInTheDocument();
   });
 });
+
+test('seviye geri düşülen bitişte "Aynı hedeflerle devam" yazmaz', async () => {
+  const user = userEvent.setup();
+  await repo.putExerciseStates({ 'band-squat': { level: 1, targetReps: 8, failStreak: 1 } });
+  await repo.saveSession(active({ exercises: [
+    { exerciseId: 'band-squat', level: 1, levelLabel: 'Bantlı squat (Kırmızı)', targetReps: 8, sets: [5, 5, 5] },
+  ] }));
+  render(<Workout settings={settings} />);
+  await user.click(await screen.findByRole('button', { name: 'Bitir' }));
+  expect(await screen.findByText(/^Bir seviye geri/)).toBeInTheDocument();
+  const hero = screen.getByRole('heading', { name: 'Bugün çalıştırdığın kaslar' }).closest('section')!;
+  expect(within(hero).getByText('3 set')).toBeInTheDocument();
+  expect(screen.queryByText(/Aynı hedeflerle devam/)).not.toBeInTheDocument();
+});

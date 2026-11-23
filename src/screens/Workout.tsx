@@ -290,12 +290,14 @@ function ExerciseCard({ entry, settings, onPick, onSet }: CardProps) {
 }
 
 function SummaryHero({ session, results }: { session: Session; results: FinishResult[] }) {
-  const { sets, progressed } = finishStats(session, results);
+  const { sets, progressed, regressed } = finishStats(session, results);
+  // Seviye geri düşen varsa "aynı hedefler" demek yanlış olur; o durumda sadece set sayısı.
+  const detail = progressed > 0 ? ` · ${progressed} hareket ilerledi` : regressed > 0 ? '' : ' · Aynı hedeflerle devam';
   return (
     <section className="card hero">
       <h2>Bugün çalıştırdığın kaslar</h2>
       <BodyMap muscles={sessionMuscles(session)} size={150} tone="onDark" />
-      <p className="hero-sub center">{`${sets} set · ${progressed > 0 ? `${progressed} hareket ilerledi` : 'Aynı hedeflerle devam'}`}</p>
+      <p className="hero-sub center">{`${sets} set${detail}`}</p>
     </section>
   );
 }

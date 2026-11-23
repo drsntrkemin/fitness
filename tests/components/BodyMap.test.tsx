@@ -45,3 +45,9 @@ test('etiketler: ana turuncu, yardımcı gri; istenirse yardımcılar gizlenir',
   expect(screen.queryByText('Arka omuz')).not.toBeInTheDocument();
   expect(screen.getByText('Biceps')).toBeInTheDocument();
 });
+
+test('bel, kanat kaslarının altında çizilir (kanadı örtmez)', () => {
+  render(<BodyMap muscles={{ primary: ['lats'], secondary: [] }} size={150} />);
+  const groups = [...screen.getByRole('img', { name: /^Arka/ }).querySelectorAll('[data-muscle]')].map((g) => g.getAttribute('data-muscle'));
+  expect(groups.indexOf('lowerBack')).toBeLessThan(groups.indexOf('lats'));
+});

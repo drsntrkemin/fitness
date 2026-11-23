@@ -65,5 +65,6 @@ test('finishStats girilen setleri ve ilerleyen hareketleri sayar', () => {
     { exerciseId: 'pushup', level: 1, levelLabel: 'x', targetReps: 10, sets: [10, null, null] },
   ]);
   expect(finishStats(s, [{ event: 'reps-up' }, { event: 'level-up' }, { event: 'max-level' }, { event: 'none' }]))
-    .toEqual({ sets: 3, progressed: 2 });
+    .toEqual({ sets: 3, progressed: 2, regressed: 0 });
+  expect(finishStats(s, [{ event: 'level-down' }, { event: 'none' }]).regressed).toBe(1);
 });
