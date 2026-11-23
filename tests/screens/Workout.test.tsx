@@ -145,3 +145,32 @@ test('uzun merdivenli harekette başlangıç seviyesi açılır listeden seçili
   expect(screen.getByText('Yer şınavı')).toBeInTheDocument();
   await vi.waitFor(async () => expect((await repo.getActiveSession())?.exercises[0]).toMatchObject({ level: 10, levelLabel: 'Yer şınavı' }));
 });
+
+test('Başla\'ya art arda iki dokunuş tek oturum açar', async () => {
+  const { fireEvent } = await import('@testing-library/react');
+  const { db } = await import('../../src/data/db');
+  render(<Workout settings={settings} />);
+  const start = await screen.findByRole('button', { name: 'Başla' });
+  fireEvent.click(start);
+  fireEvent.click(start);
+  await screen.findByRole('heading', { name: 'Antrenman A' });
+  await new Promise((r) => setTimeout(r, 50));
+  expect(await db.sessions.where('status').equals('active').count()).toBe(1);
+});
+
+test('Bitir\'e art arda iki dokunuş ilerlemeyi bir kez uygular', async () => {
+  const { fireEvent } = await import('@testing-library/react');
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+  const st = { 'band-squat': { level: 1, targetReps: 8, failStreak: 0 } };
+  await repo.putExerciseStates(st);
+  await repo.saveSession(active({ exercises: [
+    { exerciseId: 'band-squat', level: 1, levelLabel: 'Bantlı squat (Kırmızı)', targetReps: 8, sets: [5, 5, 5] },
+  ] }));
+  render(<Workout settings={settings} />);
+  const finish = await screen.findByRole('button', { name: 'Bitir' });
+  fireEvent.click(finish);
+  fireEvent.click(finish);
+  await screen.findByRole('heading', { name: /Antrenman bitti/ });
+  await new Promise((r) => setTimeout(r, 50));
+  expect((await repo.getExerciseStates())['band-squat']).toEqual({ level: 1, targetReps: 8, failStreak: 1 });
+});

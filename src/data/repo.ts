@@ -44,6 +44,37 @@ export async function saveSession(s: Session): Promise<number> {
   return (await db.sessions.put(s)) as number;
 }
 
+/** Aktif oturum varsa onu döndürür, yoksa build() ile yenisini ekler — tek işlemde (çift dokunuşa karşı). */
+export async function startSession(build: () => Session): Promise<Session> {
+  return db.transaction('rw', db.sessions, async () => {
+    const existing = (await db.sessions.where('status').equals('active').toArray()).sort(byNewest)[0];
+    if (existing) return existing;
+    const s = build();
+    const id = (await db.sessions.add(s)) as number;
+    return { ...s, id };
+  });
+}
+
+/**
+ * Aktif oturumu tek işlemde bitirir: güncel kaydı ve durumları okur, compute ile yeni durumları hesaplar,
+ * durumları ve "bitti" bilgisini birlikte yazar. Oturum yoksa ya da zaten bittiyse hiçbir şey yapmaz ve null döner.
+ */
+export async function completeSession<T>(
+  id: number,
+  compute: (s: Session, states: Record<string, ExerciseState>) => { states: Record<string, ExerciseState>; result: T },
+): Promise<T | null> {
+  return db.transaction('rw', [db.sessions, db.exerciseStates], async () => {
+    const s = await db.sessions.get(id);
+    if (!s || s.status !== 'active') return null;
+    const rows = await db.exerciseStates.toArray();
+    const states = Object.fromEntries(rows.map(({ id: exId, ...st }) => [exId, st]));
+    const r = compute(s, states);
+    await db.exerciseStates.bulkPut(Object.entries(r.states).map(([exId, st]) => ({ id: exId, ...st })));
+    await db.sessions.put({ ...s, status: 'done' });
+    return r.result;
+  });
+}
+
 export async function deleteSession(id: number): Promise<void> {
   await db.sessions.delete(id);
 }

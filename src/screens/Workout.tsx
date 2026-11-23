@@ -29,6 +29,15 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
   const [session, setSession] = useState<Session | null>(null);
   const sessionRef = useRef<Session | null>(null);
   const started = useRef(false);
+  // Başla/Bitir/Vazgeç sürerken ikinci dokunuşu yok say (çift dokunuş = çift oturum ya da çift ilerleme).
+  const busyRef = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const guard = async (fn: () => Promise<void>) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    try { await fn(); } finally { busyRef.current = false; setBusy(false); }
+  };
 
   const loadIdle = useCallback(async (): Promise<Idle> => {
     const [states, last, done] = await Promise.all([repo.getExerciseStates(), repo.lastFinishedDay(), repo.listSessions()]);
@@ -41,13 +50,12 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
     setView({ kind: 'active' });
   };
 
-  const start = useCallback(async () => {
+  const start = useCallback(() => guard(async () => {
     const data = await loadIdle();
-    const s = createSession(data.next, localDateKey(new Date()), settings, data.states);
-    const id = await repo.saveSession(s);
-    showSession({ ...s, id });
+    const s = await repo.startSession(() => createSession(data.next, localDateKey(new Date()), settings, data.states));
+    showSession(s);
     onSessionChange?.();
-  }, [loadIdle, settings, onSessionChange]);
+  }), [loadIdle, settings, onSessionChange]);
 
   useEffect(() => {
     let cancelled = false;
@@ -75,21 +83,24 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
     void repo.saveSession(next);
   };
 
-  const finish = async () => {
+  const finish = () => guard(async () => {
     const s = sessionRef.current;
-    if (!s) return;
+    if (!s?.id) return;
     const hasGaps = s.exercises.some((e) => e.level >= 0 && e.sets.some((v) => v === null));
     if (hasGaps && !window.confirm('Bazı setler boş. Boş setler yapılmadı sayılacak. Antrenman bitirilsin mi?')) return;
-    const r = finishSession(s, settings, await repo.getExerciseStates());
-    await repo.putExerciseStates(r.states);
-    await repo.saveSession({ ...s, status: 'done' });
+    await repo.saveSession(s); // son dokunuş da kayıtlı olsun
+    // İlerleme ve "bitti" bilgisi tek işlemde yazılır; oturum zaten bittiyse null döner.
+    const results = await repo.completeSession(s.id, (fresh, states) => {
+      const r = finishSession(fresh, settings, states);
+      return { states: r.states, result: r.results };
+    });
     sessionRef.current = null;
     setSession(null);
-    setView({ kind: 'summary', results: r.results });
+    setView(results ? { kind: 'summary', results } : { kind: 'idle', data: await loadIdle() });
     onSessionChange?.();
-  };
+  });
 
-  const cancel = async () => {
+  const cancel = () => guard(async () => {
     const s = sessionRef.current;
     if (!s?.id) return;
     if (!window.confirm('Bu antrenman silinsin mi? Girdiğin setler kaybolur.')) return;
@@ -98,7 +109,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
     setSession(null);
     setView({ kind: 'idle', data: await loadIdle() });
     onSessionChange?.();
-  };
+  });
 
   if (view.kind === 'loading') return <main className="screen" aria-busy="true" />;
 
@@ -128,7 +139,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
       <main className="screen">
         <header className="screen-header">
           <h1>Antrenman {session.day}</h1>
-          <button type="button" className="btn btn-primary" disabled={!hasAnySet(session)} onClick={finish}>Bitir</button>
+          <button type="button" className="btn btn-primary" disabled={busy || !hasAnySet(session)} onClick={finish}>Bitir</button>
         </header>
         {session.exercises.map((e) => (
           <ExerciseCard key={e.exerciseId} entry={e} settings={settings}
@@ -136,7 +147,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
             onSet={(i, v) => apply((s) => setRep(s, e.exerciseId, i, v))} />
         ))}
         <div className="actions">
-          <button type="button" className="btn btn-danger" onClick={cancel}>Vazgeç</button>
+          <button type="button" className="btn btn-danger" disabled={busy} onClick={cancel}>Vazgeç</button>
         </div>
       </main>
     );
@@ -150,7 +161,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
       <section className="card next-card">
         <h2>Sıradaki: Antrenman {data.next}</h2>
         <p className="muted small">{exercisesFor(data.next).length} hareket · yaklaşık 45 dakika</p>
-        <button type="button" className="btn btn-primary btn-block" onClick={start}>Başla</button>
+        <button type="button" className="btn btn-primary btn-block" disabled={busy} onClick={start}>Başla</button>
       </section>
       {(['A', 'B'] as const).map((day) => (
         <section key={day} className="card">
