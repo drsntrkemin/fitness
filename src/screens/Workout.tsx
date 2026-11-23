@@ -163,9 +163,14 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
               return (
                 <li key={ex.id} className="list-row level-row">
                   <span className="grow">{ex.name}</span>
-                  <span className="muted small right">
-                    {st ? `${ladder[clampLevel(st.level, ladder.length)]} · ${sets} × ${st.targetReps}` : 'Seviye seçilmedi'}
-                  </span>
+                  {st ? (
+                    <span className="right level-info">
+                      <span className="muted small">{ladder[clampLevel(st.level, ladder.length)]}</span>
+                      <strong className="small">{`${sets} × ${st.targetReps}`}</strong>
+                    </span>
+                  ) : (
+                    <span className="muted small right">Seviye seçilmedi</span>
+                  )}
                 </li>
               );
             })}

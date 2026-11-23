@@ -154,7 +154,8 @@ input.mini { width: 56px !important; text-align: center; padding: 8px 4px !impor
 /* ── Antrenman ── */
 .btn-block { width: 100%; margin-top: 12px; }
 .group-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 8px; }
-.level-row .right { text-align: right; max-width: 60%; }
+.level-row .right { text-align: right; max-width: 62%; }
+.level-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.25; }
 .next-card h2 { font-size: 1.25rem; margin-bottom: 4px; }
 
 .ex-head { display: flex; align-items: center; justify-content: space-between; }

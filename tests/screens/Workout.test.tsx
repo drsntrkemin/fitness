@@ -38,7 +38,9 @@ test('oturum yokken sıradaki günü, hareket seviyelerini ve Başla düğmesini
   await repo.saveSession({ ...active(), day: 'A', status: 'done', date: '2026-11-20' });
   render(<Workout settings={settings} />);
   expect(await screen.findByText('Sıradaki: Antrenman B')).toBeInTheDocument();
-  expect(screen.getByText('Eğimli şınav – 9. kademe · 3 × 10')).toBeInTheDocument();
+  const row = screen.getByText('Şınav').closest('li')!;
+  expect(within(row).getByText('Eğimli şınav – 9. kademe')).toBeInTheDocument();
+  expect(within(row).getByText('3 × 10')).toBeInTheDocument();
   expect(screen.getAllByText('Seviye seçilmedi').length).toBeGreaterThan(0);
   expect(screen.getByText(/20 Kas Cum/)).toBeInTheDocument();
 });
