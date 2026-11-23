@@ -267,3 +267,23 @@ select {
 .measure-values { display: flex; flex-wrap: wrap; gap: 0 10px; font-weight: 600; }
 .link-btn.danger { color: var(--danger); }
 .measure-form { padding: 4px 0 8px; }
+
+/* ── Kas haritası ── */
+:root { --muscle-p: #f97316; --muscle-s: #fdba74; --bm-body: #e6eaed; --bm-idle: #cdd4d9; }
+@media (prefers-color-scheme: dark) { :root { --bm-body: #2a3036; --bm-idle: #3b444c; } }
+.bodymap { display: flex; justify-content: center; gap: 14px; }
+.bodymap-fig { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bodymap-fig figcaption { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; opacity: 0.75; }
+.bodymap svg { display: block; }
+.bodymap .bm-base { fill: var(--bm-body); }
+.bodymap [data-state="idle"] { fill: var(--bm-idle); }
+.bodymap.onDark .bm-base { fill: rgb(255 255 255 / 0.16); }
+.bodymap.onDark [data-state="idle"] { fill: rgb(255 255 255 / 0.28); }
+.bodymap [data-state="primary"] { fill: var(--muscle-p); }
+.bodymap [data-state="secondary"] { fill: var(--muscle-s); }
+
+.muscle-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 6px 0 4px; }
+.muscle-chips li { font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.muscle-chips .chip-p { background: #ffedd5; color: #c2410c; }
+.muscle-chips .chip-s { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+@media (prefers-color-scheme: dark) { .muscle-chips .chip-p { background: #431d07; color: #fdba74; } }
