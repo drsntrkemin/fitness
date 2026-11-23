@@ -174,3 +174,57 @@ test('Bitir\'e art arda iki dokunuş ilerlemeyi bir kez uygular', async () => {
   await new Promise((r) => setTimeout(r, 50));
   expect((await repo.getExerciseStates())['band-squat']).toEqual({ level: 1, targetReps: 8, failStreak: 1 });
 });
+
+describe('kas haritası', () => {
+  test('aktif antrenmanda günün kas haritası ve hareket sayısı gösterilir', async () => {
+    await repo.saveSession(active());
+    render(<Workout settings={settings} />);
+    const hero = (await screen.findByRole('heading', { name: 'Bugün çalışacak kasların 🔥' })).closest('section')!;
+    expect(within(hero).getByText('2 hareket · tüm vücut')).toBeInTheDocument();
+    expect(within(hero).getByRole('img', { name: /^Arka: .*Kanat/ })).toBeInTheDocument();
+    expect(within(hero).getByRole('img', { name: /^Ön: .*Göğüs/ })).toBeInTheDocument();
+  });
+
+  test('her hareket kartında çalışan kas etiketleri var', async () => {
+    await repo.saveSession(active());
+    render(<Workout settings={settings} />);
+    const card = (await screen.findByRole('heading', { name: 'Barfiks' })).closest('section')!;
+    const chips = within(card).getByRole('list', { name: 'Çalışan kaslar' });
+    expect(within(chips).getByText('Kanat')).toHaveClass('chip-p');
+    expect(within(chips).getByText('Ön kol')).toHaveClass('chip-s');
+  });
+
+  test('bitirince çalıştırılan kaslar ve set/ilerleme özeti gösterilir', async () => {
+    const user = userEvent.setup();
+    await repo.putExerciseStates({ pushup: { level: 1, targetReps: 10, failStreak: 0 } });
+    await repo.saveSession(active({ exercises: [
+      { exerciseId: 'pullup', level: 1, levelLabel: 'Bant destekli (Siyah)', targetReps: 4, sets: [null, null, null] },
+      { exerciseId: 'pushup', level: 1, levelLabel: 'Eğimli şınav – 9. kademe', targetReps: 10, sets: [10, 10, 10] },
+    ] }));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    render(<Workout settings={settings} />);
+    await user.click(await screen.findByRole('button', { name: 'Bitir' }));
+    const hero = (await screen.findByRole('heading', { name: 'Bugün çalıştırdığın kaslar' })).closest('section')!;
+    expect(within(hero).getByText('3 set · 1 hareket ilerledi')).toBeInTheDocument();
+    // Yalnız set girilen şınavın kasları: göğüs var, kanat (barfiks) yok.
+    expect(within(hero).getByRole('img', { name: /^Ön: Göğüs/ })).toBeInTheDocument();
+    expect(within(hero).getByRole('img', { name: /^Arka: Triceps$/ })).toBeInTheDocument();
+  });
+
+  test('ilerleme yoksa "Aynı hedeflerle devam" yazar', async () => {
+    const user = userEvent.setup();
+    await repo.saveSession(active({ exercises: [
+      { exerciseId: 'band-squat', level: 1, levelLabel: 'Bantlı squat (Kırmızı)', targetReps: 10, sets: [9, 9, 9] },
+    ] }));
+    render(<Workout settings={settings} />);
+    await user.click(await screen.findByRole('button', { name: 'Bitir' }));
+    expect(await screen.findByText('3 set · Aynı hedeflerle devam')).toBeInTheDocument();
+  });
+
+  test('bekleme ekranındaki "Sıradaki" kartında günün kas figürü var', async () => {
+    render(<Workout settings={settings} />);
+    const card = (await screen.findByText('Sıradaki: Antrenman A')).closest('section')!;
+    expect(within(card).getByRole('img', { name: /^Ön:/ })).toBeInTheDocument();
+    expect(within(card).getByRole('button', { name: 'Başla' })).toBeInTheDocument();
+  });
+});

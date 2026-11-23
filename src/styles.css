@@ -287,3 +287,17 @@ select {
 .muscle-chips .chip-p { background: #ffedd5; color: #c2410c; }
 .muscle-chips .chip-s { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
 @media (prefers-color-scheme: dark) { .muscle-chips .chip-p { background: #431d07; color: #fdba74; } }
+
+/* ── Degrade (hero) kartlar ── */
+.card.hero { background: linear-gradient(135deg, #0f766e, #134e4a); color: #fff; border: 0; }
+.card.hero h2 { color: #fff; font-size: 1.2rem; margin: 0 0 2px; }
+.hero-sub { color: #c7e7e3; font-size: 0.88rem; margin: 0 0 8px; }
+.hero-sub.center { text-align: center; margin: 8px 0 0; font-weight: 600; }
+.card.hero .bodymap { margin: 8px 0 4px; }
+.card.hero .bodymap-fig figcaption { color: #c7e7e3; }
+.card.hero .muscle-chips .chip-p { background: rgb(255 255 255 / 0.18); color: #fff; }
+.next-row { display: flex; align-items: center; gap: 12px; }
+.next-workout .bodymap { gap: 6px; margin: 0; }
+.btn-hero { background: #fff; color: #0f766e; border: 0; }
+@media (prefers-color-scheme: dark) { .btn-hero { background: #fff; color: #0f766e; } }
+.card.hero .week-count { color: #c7e7e3; }

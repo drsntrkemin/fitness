@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import BodyMap from '../components/BodyMap';
+import MuscleChips from '../components/MuscleChips';
+import NextWorkoutCard from '../components/NextWorkoutCard';
 import { SetBox, SetStepper } from '../components/SetInput';
 import * as repo from '../data/repo';
 import { EXERCISES } from '../domain/catalog';
 import { formatDay, localDateKey } from '../domain/dates';
+import { dayMuscles, finishStats, sessionMuscles } from '../domain/muscles';
 import { buildLadder, clampLevel, exercisesFor, nextDay, repRange, setsFor } from '../domain/program';
 import { chooseLevel, createSession, finishSession, hasAnySet, setRep, type FinishResult } from '../domain/session';
 import type { DayKey, ExerciseState, Session, SessionExercise, Settings } from '../domain/types';
@@ -20,7 +24,7 @@ type View =
   | { kind: 'loading' }
   | { kind: 'idle'; data: Idle }
   | { kind: 'active' }
-  | { kind: 'summary'; results: FinishResult[] };
+  | { kind: 'summary'; results: FinishResult[]; session: Session };
 
 const nameOf = (id: string) => EXERCISES.find((e) => e.id === id)?.name ?? id;
 
@@ -90,13 +94,13 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
     if (hasGaps && !window.confirm('Bazı setler boş. Boş setler yapılmadı sayılacak. Antrenman bitirilsin mi?')) return;
     await repo.saveSession(s); // son dokunuş da kayıtlı olsun
     // İlerleme ve "bitti" bilgisi tek işlemde yazılır; oturum zaten bittiyse null döner.
-    const results = await repo.completeSession(s.id, (fresh, states) => {
+    const done = await repo.completeSession(s.id, (fresh, states) => {
       const r = finishSession(fresh, settings, states);
-      return { states: r.states, result: r.results };
+      return { states: r.states, result: { results: r.results, session: fresh } };
     });
     sessionRef.current = null;
     setSession(null);
-    setView(results ? { kind: 'summary', results } : { kind: 'idle', data: await loadIdle() });
+    setView(done ? { kind: 'summary', ...done } : { kind: 'idle', data: await loadIdle() });
     onSessionChange?.();
   });
 
@@ -117,6 +121,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
     return (
       <main className="screen">
         <header className="screen-header"><h1>Antrenman bitti 💪</h1></header>
+        <SummaryHero session={view.session} results={view.results} />
         <section className="card">
           <ul className="list">
             {view.results.map((r) => (
@@ -141,6 +146,12 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
           <h1>Antrenman {session.day}</h1>
           <button type="button" className="btn btn-primary" disabled={busy || !hasAnySet(session)} onClick={finish}>Bitir</button>
         </header>
+        <section className="card hero">
+          <h2>Bugün çalışacak kasların 🔥</h2>
+          <p className="hero-sub">{`${session.exercises.length} hareket · tüm vücut`}</p>
+          <BodyMap muscles={dayMuscles(session.day)} size={190} tone="onDark" />
+          <MuscleChips muscles={dayMuscles(session.day)} showSecondary={false} />
+        </section>
         {session.exercises.map((e) => (
           <ExerciseCard key={e.exerciseId} entry={e} settings={settings}
             onPick={(level) => apply((s) => chooseLevel(s, e.exerciseId, level, settings))}
@@ -158,11 +169,9 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
   return (
     <main className="screen">
       <header className="screen-header"><h1>Antrenman</h1></header>
-      <section className="card next-card">
-        <h2>Sıradaki: Antrenman {data.next}</h2>
-        <p className="muted small">{exercisesFor(data.next).length} hareket · yaklaşık 50–55 dakika</p>
-        <button type="button" className="btn btn-primary btn-block" disabled={busy} onClick={start}>Başla</button>
-      </section>
+      <NextWorkoutCard day={data.next} title={`Sıradaki: Antrenman ${data.next}`}
+        subtitle={`${exercisesFor(data.next).length} hareket · yaklaşık 50–55 dakika`}
+        actionLabel="Başla" onAction={start} disabled={busy} />
       {(['A', 'B'] as const).map((day) => (
         <section key={day} className="card">
           <h3 className="group-title">{day} günü</h3>
@@ -251,6 +260,7 @@ function ExerciseCard({ entry, settings, onPick, onSet }: CardProps) {
         <button type="button" className="icon-btn" aria-label={`${ex.name} nasıl yapılır`} aria-expanded={showHow}
           onClick={() => setShowHow(!showHow)}>ⓘ</button>
       </div>
+      <MuscleChips muscles={ex.muscles} />
       {showHow && <p className="howto">{ex.howTo}</p>}
       {unset ? picker('Başlangıç seviyeni seç') : (
         <>
@@ -275,6 +285,17 @@ function ExerciseCard({ entry, settings, onPick, onSet }: CardProps) {
           )}
         </>
       )}
+    </section>
+  );
+}
+
+function SummaryHero({ session, results }: { session: Session; results: FinishResult[] }) {
+  const { sets, progressed } = finishStats(session, results);
+  return (
+    <section className="card hero">
+      <h2>Bugün çalıştırdığın kaslar</h2>
+      <BodyMap muscles={sessionMuscles(session)} size={150} tone="onDark" />
+      <p className="hero-sub center">{`${sets} set · ${progressed > 0 ? `${progressed} hareket ilerledi` : 'Aynı hedeflerle devam'}`}</p>
     </section>
   );
 }
