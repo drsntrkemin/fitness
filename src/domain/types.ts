@@ -23,6 +23,17 @@ export type Stage =
   /** label içinde {rung}; max: kullanılabilecek en yüksek kademe. */
   | { kind: 'rungs'; label: string; order: 'desc' | 'asc'; max?: number };
 
+/** Vücut figüründe çizilen kas bölgeleri. */
+export type Muscle =
+  | 'shoulders' | 'chest' | 'biceps' | 'forearms' | 'abs' | 'obliques' | 'quads'
+  | 'traps' | 'rearDelts' | 'upperBack' | 'lats' | 'lowerBack' | 'triceps' | 'glutes' | 'hamstrings' | 'calves';
+
+/** Bir hareketin (ya da günün) ana ve yardımcı kasları. */
+export interface MuscleSet {
+  primary: Muscle[];
+  secondary: Muscle[];
+}
+
 export interface ExerciseDef {
   id: string;
   name: string;
@@ -37,6 +48,7 @@ export interface ExerciseDef {
   accessory?: boolean;
   stages: Stage[];
   howTo: string;
+  muscles: MuscleSet;
 }
 
 export interface ExerciseOverride {
