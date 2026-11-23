@@ -19,16 +19,18 @@ const ex = (id: string) => {
 };
 
 describe('katalog', () => {
-  test('A ve B günleri spec sırasıyla beşer hareket içerir', () => {
+  test('A ve B günleri spec sırasıyla beş ana + iki yardımcı hareket içerir', () => {
     expect(exercisesFor('A').map((e) => e.id)).toEqual(
-      ['pullup', 'pushup', 'band-squat', 'band-rdl', 'hanging-raise']);
+      ['pullup', 'pushup', 'band-squat', 'band-rdl', 'hanging-raise', 'band-lateral-raise', 'band-curl']);
     expect(exercisesFor('B').map((e) => e.id)).toEqual(
-      ['inverted-row', 'band-press', 'band-lunge', 'band-hip-thrust', 'band-pallof']);
+      ['inverted-row', 'band-press', 'band-lunge', 'band-hip-thrust', 'band-pallof', 'band-fly', 'band-pushdown']);
   });
 
-  test('barfiks 4–8, diğerleri 8–12 tekrar aralığında', () => {
+  test('barfiks 4–8, yardımcı hareketler 10–15, diğerleri 8–12 tekrar aralığında', () => {
+    const accessory = ['band-lateral-raise', 'band-curl', 'band-fly', 'band-pushdown'];
     for (const e of EXERCISES) {
-      expect([e.repMin, e.repMax]).toEqual(e.id === 'pullup' ? [4, 8] : [8, 12]);
+      const expected = e.id === 'pullup' ? [4, 8] : accessory.includes(e.id) ? [10, 15] : [8, 12];
+      expect([e.repMin, e.repMax]).toEqual(expected);
     }
   });
 
@@ -67,8 +69,8 @@ describe('buildLadder', () => {
   });
 
   test('bantlı hareket bantları hafiften ağıra sıralar', () => {
-    expect(buildLadder(ex('band-squat'), eq)).toEqual([
-      'Bantlı squat (Sarı)', 'Bantlı squat (Kırmızı)', 'Bantlı squat (Siyah)',
+    expect(buildLadder(ex('band-rdl'), eq)).toEqual([
+      'Bantlı Romanian deadlift (Sarı)', 'Bantlı Romanian deadlift (Kırmızı)', 'Bantlı Romanian deadlift (Siyah)',
     ]);
   });
 
@@ -77,14 +79,40 @@ describe('buildLadder', () => {
     expect(buildLadder(ex('band-lunge'), eq)).toHaveLength(4);
   });
 
-  test('bant yoksa bantlı hareket "Vücut ağırlığı" seviyesine düşer', () => {
-    expect(buildLadder(ex('band-squat'), { bands: [], ladderRungs: 5 })).toEqual(['Vücut ağırlığı']);
+  test('bant yoksa yalnız bantlı hareket "Vücut ağırlığı" seviyesine düşer', () => {
+    expect(buildLadder(ex('band-rdl'), { bands: [], ladderRungs: 5 })).toEqual(['Vücut ağırlığı']);
   });
 
   test('bant yoksa barfiks bant destekli aşamayı atlar', () => {
     expect(buildLadder(ex('pullup'), { bands: [], ladderRungs: 5 })).toEqual([
       'Negatif barfiks (yavaş iniş)', 'Tam barfiks', 'Yavaş tempolu barfiks (3 sn iniş)',
     ]);
+  });
+
+  test('yardımcı hareketler bantlarla ilerler', () => {
+    for (const id of ['band-lateral-raise', 'band-curl', 'band-fly', 'band-pushdown']) {
+      expect(buildLadder(ex(id), eq)).toHaveLength(3);
+    }
+    expect(buildLadder(ex('band-fly'), eq)[0]).toBe('Bantlı göğüs fly (Sarı)');
+  });
+
+  test('squat en ağır banttan sonra tek bacak varyasyonlarıyla devam eder', () => {
+    expect(buildLadder(ex('band-squat'), eq)).toEqual([
+      'Bantlı squat (Sarı)', 'Bantlı squat (Kırmızı)', 'Bantlı squat (Siyah)',
+      'Bulgar split squat (her bacak)', 'Merdivene tutunarak tek bacak squat (her bacak)',
+    ]);
+  });
+
+  test('omuz press en ağır banttan sonra pike şınavla devam eder, ayaklar en fazla 3. kademe', () => {
+    expect(buildLadder(ex('band-press'), eq)).toEqual([
+      'Bantlı omuz press (Sarı)', 'Bantlı omuz press (Kırmızı)', 'Bantlı omuz press (Siyah)',
+      'Pike şınav (ayaklar yerde)', 'Pike şınav – ayaklar 1. kademe', 'Pike şınav – ayaklar 2. kademe', 'Pike şınav – ayaklar 3. kademe',
+    ]);
+  });
+
+  test('merdiven devamları sona eklendiği için mevcut seviyeler kaymaz', () => {
+    const before = ['Bantlı squat (Sarı)', 'Bantlı squat (Kırmızı)', 'Bantlı squat (Siyah)'];
+    expect(buildLadder(ex('band-squat'), eq).slice(0, 3)).toEqual(before);
   });
 
   test('kademe sayısı 2 ise ayaklar merdivende aşaması 2 kademeyle sınırlı', () => {
@@ -105,6 +133,8 @@ describe('setsFor ve repRange', () => {
     expect(setsFor(ex('band-squat'), 2)).toBe(4);
     expect(setsFor(ex('band-pallof'), 2)).toBe(3);
     expect(setsFor(ex('hanging-raise'), 2)).toBe(3);
+    expect(setsFor(ex('band-curl'), 2)).toBe(3);
+    expect(setsFor(ex('band-fly'), 3)).toBe(3);
     expect(setsFor(ex('band-squat'), 3)).toBe(3);
   });
 

@@ -33,6 +33,8 @@ export interface ExerciseDef {
   perSide?: boolean;
   /** Karın hareketi: haftada 2 günde de 3 set kalır. */
   core?: boolean;
+  /** Yardımcı (izolasyon) hareket: günün sonunda süperset; haftada 2 günde de 3 set kalır. */
+  accessory?: boolean;
   stages: Stage[];
   howTo: string;
 }

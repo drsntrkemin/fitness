@@ -77,7 +77,7 @@ describe('antrenman kartı', () => {
     const user = userEvent.setup();
     await repo.saveSession(done(addDays(today, -2), 'A'));
     const props = renderToday();
-    expect(await screen.findByText('Sıradaki: Antrenman B (5 hareket)')).toBeInTheDocument();
+    expect(await screen.findByText('Sıradaki: Antrenman B (7 hareket)')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Başla' }));
     expect(props.onStartWorkout).toHaveBeenCalled();
   });

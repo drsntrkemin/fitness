@@ -41,7 +41,7 @@ await page.getByLabel('Protein (g)').fill('160');
 await page.getByLabel('Karbonhidrat (g)').fill('220');
 await page.getByLabel('Yağ (g)').fill('70');
 await page.getByRole('button', { name: 'Bitir' }).click();
-check(await visible(page.getByText('Sıradaki: Antrenman A (5 hareket)')), 'kurulum sonrası Bugün ekranı açıldı');
+check(await visible(page.getByText('Sıradaki: Antrenman A (7 hareket)')), 'kurulum sonrası Bugün ekranı açıldı');
 
 // 2) Antrenman
 await page.getByRole('button', { name: 'Başla' }).click();
@@ -66,7 +66,7 @@ await page.getByText('420 / 2200 kcal').waitFor();
 
 // 4) Yenile → veriler duruyor mu?
 await page.reload();
-await page.getByText('Sıradaki: Antrenman B (5 hareket)').waitFor();
+await page.getByText('Sıradaki: Antrenman B (7 hareket)').waitFor();
 check(await visible(page.getByText('420 / 2200 kcal')), 'yenilemeden sonra öğün duruyor');
 check(await visible(page.getByText('22,5 / 160 g')), 'yenilemeden sonra protein (virgüllü) duruyor');
 await tab('İlerleme');
@@ -91,7 +91,7 @@ await page.getByRole('navigation').waitFor();
 await context.setOffline(true);
 await page.reload();
 check(await visible(page.getByRole('navigation')), 'internet yokken uygulama açılıyor');
-check(await visible(page.getByText('Sıradaki: Antrenman B (5 hareket)')), 'internet yokken veriler görünüyor');
+check(await visible(page.getByText('Sıradaki: Antrenman B (7 hareket)')), 'internet yokken veriler görünüyor');
 await context.setOffline(false);
 
 check(errors.length === 0, `konsol hatası yok${errors.length ? `: ${errors.join(' | ')}` : ''}`);

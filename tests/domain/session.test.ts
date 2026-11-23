@@ -13,7 +13,7 @@ describe('createSession', () => {
   test('günün hareketlerini durumlarındaki seviye ve hedefle, boş setlerle oluşturur', () => {
     const s = createSession('A', '2026-11-23', settings, { pushup: { level: 1, targetReps: 10, failStreak: 0 } });
     expect(s).toMatchObject({ date: '2026-11-23', day: 'A', status: 'active' });
-    expect(s.exercises.map((e) => e.exerciseId)).toEqual(['pullup', 'pushup', 'band-squat', 'band-rdl', 'hanging-raise']);
+    expect(s.exercises.map((e) => e.exerciseId)).toEqual(['pullup', 'pushup', 'band-squat', 'band-rdl', 'hanging-raise', 'band-lateral-raise', 'band-curl']);
     expect(ex(s, 'pushup')).toEqual({ exerciseId: 'pushup', level: 1, levelLabel: 'Eğimli şınav – 9. kademe', targetReps: 10, sets: [null, null, null] });
   });
 
@@ -23,8 +23,8 @@ describe('createSession', () => {
   });
 
   test('bant silinip merdiven kısaldıysa seviye merdivene sığdırılır', () => {
-    const s = createSession('A', '2026-11-23', settings, { 'band-squat': { level: 5, targetReps: 9, failStreak: 0 } });
-    expect(ex(s, 'band-squat')).toMatchObject({ level: 1, levelLabel: 'Bantlı squat (Kırmızı)', targetReps: 9 });
+    const s = createSession('A', '2026-11-23', settings, { 'band-rdl': { level: 5, targetReps: 9, failStreak: 0 } });
+    expect(ex(s, 'band-rdl')).toMatchObject({ level: 1, levelLabel: 'Bantlı Romanian deadlift (Kırmızı)', targetReps: 9 });
   });
 
   test('haftada 2 günde ana hareketler 4, karın 3 set', () => {

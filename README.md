@@ -30,11 +30,12 @@ Kişisel ev antrenmanı koçu ve beslenme defteri. iPhone'da ana ekrana eklenere
 
 ### Koç nasıl ilerletir?
 
-Her hareketin bir tekrar aralığı var. Barfikste bu 4–8, diğer hareketlerde 8–12.
+Her hareketin bir tekrar aralığı var. Barfikste bu 4–8, günün sonundaki yardımcı hareketlerde (lateral raise, biceps curl, göğüs fly, triceps pushdown) 10–15, diğer hareketlerde 8–12.
 
 - Tüm setlerde hedefi yaparsan, bir sonraki sefer hedef 1 tekrar artar.
 - Aralığın üstünü geçince bir sonraki zorluğa geçersin ve tekrar sayısı alt sınıra döner. Sonraki zorluk, ağır bir bant, merdivende bir kademe aşağısı ya da daha zor bir varyasyon olabilir.
 - Aynı seviyede üst üste 2 antrenmanda alt sınırın altında kalırsan bir seviye geri inersin.
+- Squat ve omuz press'te en ağır bant da kolaylaşınca koç tek bacak squat ve pike şınav gibi merdiven varyasyonlarına geçer.
 
 ## Yedekleme
 

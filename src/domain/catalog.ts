@@ -24,8 +24,13 @@ export const EXERCISES: ExerciseDef[] = [
   },
   {
     id: 'band-squat', name: 'Bantlı squat', day: 'A', repMin: 8, repMax: 12,
-    stages: [{ kind: 'bands', label: 'Bantlı squat ({band})' }],
-    howTo: 'Bandın ortasına omuz genişliğinde bas, uçlarını omuz hizasında tut. Kalçayı geriye iterek uyluklar yere paralel olana kadar çömel, topuklardan itip kalk.',
+    // Merdiven devamları SONA eklenir: mevcut seviyeler kaymaz.
+    stages: [
+      { kind: 'bands', label: 'Bantlı squat ({band})' },
+      { kind: 'fixed', label: 'Bulgar split squat (her bacak)' },
+      { kind: 'fixed', label: 'Merdivene tutunarak tek bacak squat (her bacak)' },
+    ],
+    howTo: 'Bandın ortasına omuz genişliğinde bas, uçlarını omuz hizasında tut. Kalçayı geriye iterek uyluklar yere paralel olana kadar çömel, topuklardan itip kalk. Bulgar split squatta arka ayağının üstünü merdivenin alt kademesine koy ve tek bacakla çömel; tek bacak squatta merdivene hafifçe tutunarak dengeni koru. Bu iki aşamada tekrarlar her bacak için sayılır.',
   },
   {
     id: 'band-rdl', name: 'Bantlı Romanian deadlift', day: 'A', repMin: 8, repMax: 12,
@@ -40,6 +45,16 @@ export const EXERCISES: ExerciseDef[] = [
     ],
     howTo: 'Bara ya da en üst basamağa asıl, sallanmadan dizlerini göğsüne çek. İleri seviyede bacakları düz tutup kalça hizasına kaldır. Yavaşça indir.',
   },
+  {
+    id: 'band-lateral-raise', name: 'Bantlı lateral raise', day: 'A', repMin: 10, repMax: 15, accessory: true,
+    stages: [{ kind: 'bands', label: 'Bantlı lateral raise ({band})' }],
+    howTo: 'Bandın ortasına bas, uçlarını iki elinle yanlarda tut. Dirsekler hafif bükük, kollarını yana doğru omuz hizasına kadar kaldır, yavaşça indir. Biceps curl ile sırayla (süperset) yapabilirsin.',
+  },
+  {
+    id: 'band-curl', name: 'Bantlı biceps curl', day: 'A', repMin: 10, repMax: 15, accessory: true,
+    stages: [{ kind: 'bands', label: 'Bantlı biceps curl ({band})' }],
+    howTo: 'Bandın ortasına bas, avuçlar öne bakacak şekilde uçlarını tut. Dirseklerini gövdene sabitle, elleri omuzlara doğru kıvır, yavaşça indir.',
+  },
   // ── Antrenman B ──
   {
     id: 'inverted-row', name: 'Ters row', day: 'B', repMin: 8, repMax: 12,
@@ -48,8 +63,12 @@ export const EXERCISES: ExerciseDef[] = [
   },
   {
     id: 'band-press', name: 'Bantlı omuz press', day: 'B', repMin: 8, repMax: 12,
-    stages: [{ kind: 'bands', label: 'Bantlı omuz press ({band})' }],
-    howTo: 'Bandın ortasına bas, uçlarını omuz hizasında tut. Belini kavislemeden kollarını tam yukarı it, kontrollü indir.',
+    stages: [
+      { kind: 'bands', label: 'Bantlı omuz press ({band})' },
+      { kind: 'fixed', label: 'Pike şınav (ayaklar yerde)' },
+      { kind: 'rungs', label: 'Pike şınav – ayaklar {rung}. kademe', order: 'asc', max: 3 },
+    ],
+    howTo: 'Bandın ortasına bas, uçlarını omuz hizasında tut. Belini kavislemeden kollarını tam yukarı it, kontrollü indir. Pike şınavda kalçanı yukarı kaldırıp vücudunla ters "V" yap ve başını ellerinin arasına doğru indir; ileri seviyede ayaklarını merdivenin alt kademelerine koy.',
   },
   {
     id: 'band-lunge', name: 'Geri lunge', day: 'B', repMin: 8, repMax: 12, perSide: true,
@@ -68,5 +87,15 @@ export const EXERCISES: ExerciseDef[] = [
     id: 'band-pallof', name: 'Bantlı Pallof press', day: 'B', repMin: 8, repMax: 12, perSide: true, core: true,
     stages: [{ kind: 'bands', label: 'Bantlı Pallof press ({band})' }],
     howTo: 'Bandı merdivene göğüs hizasında bağla ve merdivene yan dur. Bandı göğsünün önünde tutup kollarını düz öne it; gövdenin dönmesine izin verme, 2 saniye tutup geri çek. Tekrarlar her taraf için sayılır.',
+  },
+  {
+    id: 'band-fly', name: 'Bantlı göğüs fly', day: 'B', repMin: 10, repMax: 15, accessory: true,
+    stages: [{ kind: 'bands', label: 'Bantlı göğüs fly ({band})' }],
+    howTo: 'Bandın ortasını merdivene göğüs hizasında dola, sırtın merdivene dönük dur ve uçlarını iki elinle tut. Dirsekler hafif bükük, kollarını önde birleştir ("sarılır gibi"), yavaşça aç. Triceps pushdown ile sırayla (süperset) yapabilirsin.',
+  },
+  {
+    id: 'band-pushdown', name: 'Bantlı triceps pushdown', day: 'B', repMin: 10, repMax: 15, accessory: true,
+    stages: [{ kind: 'bands', label: 'Bantlı triceps pushdown ({band})' }],
+    howTo: 'Bandı merdivenin üst kademesine dola, merdivene dönük dur. Dirseklerini gövdene sabitle ve uçları aşağı, kolların tam düzleşene kadar it; yavaşça bırak.',
   },
 ];

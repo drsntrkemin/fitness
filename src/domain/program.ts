@@ -41,7 +41,7 @@ export function clampLevel(level: number, ladderLength: number): number {
 
 export function setsFor(ex: ExerciseDef, daysPerWeek: 2 | 3, override?: ExerciseOverride): number {
   if (override?.sets) return override.sets;
-  return daysPerWeek === 2 && !ex.core ? 4 : 3;
+  return daysPerWeek === 2 && !ex.core && !ex.accessory ? 4 : 3;
 }
 
 export function repRange(ex: ExerciseDef, override?: ExerciseOverride): { repMin: number; repMax: number } {

@@ -160,7 +160,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
       <header className="screen-header"><h1>Antrenman</h1></header>
       <section className="card next-card">
         <h2>Sıradaki: Antrenman {data.next}</h2>
-        <p className="muted small">{exercisesFor(data.next).length} hareket · yaklaşık 45 dakika</p>
+        <p className="muted small">{exercisesFor(data.next).length} hareket · yaklaşık 50–55 dakika</p>
         <button type="button" className="btn btn-primary btn-block" disabled={busy} onClick={start}>Başla</button>
       </section>
       {(['A', 'B'] as const).map((day) => (
