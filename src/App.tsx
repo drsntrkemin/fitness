@@ -1,36 +1,44 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import TabBar, { type Tab } from './components/TabBar';
+import { getSettings } from './data/repo';
+import type { Settings } from './domain/types';
+import { requestPersist } from './platform/ios';
+import SettingsScreen from './screens/Settings';
+import Setup from './screens/Setup';
 
-type Tab = 'today' | 'workout' | 'nutrition' | 'progress';
-
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'today', label: 'Bugün', icon: '☀︎' },
-  { id: 'workout', label: 'Antrenman', icon: '🏋︎' },
-  { id: 'nutrition', label: 'Beslenme', icon: '🍽︎' },
-  { id: 'progress', label: 'İlerleme', icon: '📈︎' },
-];
+const TITLES: Record<Tab, string> = { today: 'Bugün', workout: 'Antrenman', nutrition: 'Beslenme', progress: 'İlerleme' };
 
 export default function App() {
+  const [settings, setSettings] = useState<Settings | null>(null);
   const [tab, setTab] = useState<Tab>('today');
-  const current = TABS.find((t) => t.id === tab)!;
+  const [showSettings, setShowSettings] = useState(false);
+
+  const reload = useCallback(async () => {
+    const s = await getSettings();
+    setSettings(s);
+    if (!s.setupDone) setShowSettings(false);
+  }, []);
+
+  useEffect(() => {
+    reload();
+    requestPersist();
+  }, [reload]);
+
+  if (!settings) return <div className="app" aria-busy="true" />;
+  if (!settings.setupDone) return <Setup onDone={reload} />;
+  if (showSettings) return <SettingsScreen settings={settings} onChange={reload} onClose={() => setShowSettings(false)} />;
+
   return (
     <div className="app">
       <main className="screen">
-        <h1>{current.label}</h1>
+        <header className="screen-header">
+          <h1>{TITLES[tab]}</h1>
+          {tab === 'today' && (
+            <button type="button" className="icon-btn" aria-label="Ayarlar" onClick={() => setShowSettings(true)}>⚙</button>
+          )}
+        </header>
       </main>
-      <nav className="tabbar">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className={t.id === tab ? 'tab active' : 'tab'}
-            aria-current={t.id === tab ? 'page' : undefined}
-            onClick={() => setTab(t.id)}
-          >
-            <span className="tab-icon" aria-hidden="true">{t.icon}</span>
-            <span className="tab-label">{t.label}</span>
-          </button>
-        ))}
-      </nav>
+      <TabBar tab={tab} onChange={setTab} />
     </div>
   );
 }

@@ -75,3 +75,78 @@ h1 { font-size: 1.6rem; margin: 0 0 16px; }
 .tab.active { color: var(--accent); }
 .tab-icon { font-size: 1.3rem; line-height: 1; }
 .tab-label { font-size: 0.72rem; font-weight: 600; }
+
+/* ── Ortak bileşenler ── */
+h2 { font-size: 1.05rem; margin: 0 0 12px; }
+.muted { color: var(--muted); }
+.small { font-size: 0.85rem; }
+.grow { flex: 1; min-width: 0; }
+.eyebrow { color: var(--accent); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 4px; }
+
+.screen-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.screen-header h1 { margin: 0; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 44px; padding: 0 16px;
+  border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface); font-weight: 600; cursor: pointer;
+}
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+@media (prefers-color-scheme: dark) { .btn-primary { color: #04201d; } }
+.btn-danger { color: var(--danger); border-color: var(--danger); }
+.btn-block { width: 100%; }
+
+.icon-btn {
+  min-width: 44px; min-height: 44px;
+  border: 0; background: none; font-size: 1.25rem; cursor: pointer; border-radius: 10px;
+}
+.icon-btn:disabled { opacity: 0.3; }
+.icon-btn.danger { color: var(--danger); }
+
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+
+.field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.field > span { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+input:not([type='radio']):not([type='file']) {
+  min-height: 44px; padding: 8px 12px; width: 100%;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--bg);
+  font-size: 16px; /* iOS yakınlaştırmasını önler */
+}
+input[aria-invalid='true'] { border-color: var(--danger); }
+input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+
+.inline-form { display: flex; gap: 8px; align-items: flex-end; }
+.inline-form .field { margin-bottom: 0; }
+
+.list { list-style: none; margin: 0 0 12px; padding: 0; }
+.list-row { display: flex; align-items: center; gap: 4px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.list-row:last-child { border-bottom: 0; }
+.band-rank { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; margin-right: 8px; }
+
+.error { color: var(--danger); font-size: 0.9rem; margin: 4px 0; }
+.notice { padding: 10px 12px; border-radius: 10px; margin: 0 0 16px; }
+.notice.ok { background: var(--accent-soft); }
+.notice.error { background: color-mix(in srgb, var(--danger) 15%, transparent); color: var(--danger); }
+
+.segmented { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 3px; }
+.seg { flex: 1; text-align: center; padding: 10px 8px; border-radius: 9px; font-weight: 600; cursor: pointer; min-height: 44px; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgb(0 0 0 / 0.12); }
+
+.override-row { display: flex; align-items: center; gap: 6px; padding: 4px 0; }
+.override-row .grow { font-size: 0.9rem; }
+input.mini { width: 56px !important; text-align: center; padding: 8px 4px !important; }
+
+.file-btn { position: relative; overflow: hidden; }
+.file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+.danger-zone { border-color: color-mix(in srgb, var(--danger) 40%, var(--border)); }
+.band-editor { margin-bottom: 16px; }
+.override-head { padding-bottom: 0; }
+.mini-head { width: 56px; text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--muted); }
