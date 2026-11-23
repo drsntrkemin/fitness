@@ -1,5 +1,6 @@
 // Tüm kalıcı veri erişimi bu modülden geçer (spec §4: ileride bulut senkronuna geçişi kolaylaştırır).
 import { db } from './db';
+import { remapSession, remapStates } from '../domain/remap';
 import type { DateKey, DayKey, ExerciseState, Meal, Measurement, Session, Settings } from '../domain/types';
 
 export const DEFAULT_SETTINGS: Settings = Object.freeze({
@@ -21,6 +22,22 @@ export async function getSettings(): Promise<Settings> {
 
 export async function saveSettings(s: Settings): Promise<void> {
   await db.settings.put({ key: 'main', value: s });
+}
+
+/**
+ * Ekipmanı değiştirir ve kayıtlı seviyeleri (hareket durumları + açık antrenman) yeni merdivene taşır — tek işlemde.
+ * Böylece bant eklemek/silmek ya da kademe sayısını değiştirmek koçun önerdiği bandı sessizce değiştirmez.
+ */
+export async function updateEquipment(prev: Settings, next: Settings): Promise<void> {
+  await db.transaction('rw', [db.settings, db.exerciseStates, db.sessions], async () => {
+    const rows = await db.exerciseStates.toArray();
+    const states = Object.fromEntries(rows.map(({ id, ...st }) => [id, st]));
+    const moved = remapStates(states, prev.equipment, next.equipment);
+    await db.exerciseStates.bulkPut(Object.entries(moved).map(([id, st]) => ({ id, ...st })));
+    const active = await db.sessions.where('status').equals('active').toArray();
+    for (const s of active) await db.sessions.put(remapSession(s, prev.equipment, next.equipment));
+    await db.settings.put({ key: 'main', value: next });
+  });
 }
 
 export async function getExerciseStates(): Promise<Record<string, ExerciseState>> {

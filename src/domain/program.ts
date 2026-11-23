@@ -8,23 +8,31 @@ const range = (from: number, to: number) => {
   return out;
 };
 
-/** Hareketin aşamalarını kullanıcının ekipmanına göre seviye etiketlerine açar (kolaydan zora). */
-export function buildLadder(ex: ExerciseDef, eq: Equipment): string[] {
-  const levels: string[] = [];
-  for (const stage of ex.stages) {
+/**
+ * Merdivenin seviyeleri: etiket + ekipmandan bağımsız kimlik (aşama + bant id / kademe).
+ * Kimlik, ekipman değişince seviyeyi yeni merdivende bulmak için kullanılır.
+ */
+export function ladderEntries(ex: ExerciseDef, eq: Equipment): { key: string; label: string }[] {
+  const levels: { key: string; label: string }[] = [];
+  ex.stages.forEach((stage, si) => {
     if (stage.kind === 'fixed') {
-      levels.push(stage.label);
+      levels.push({ key: `${si}:fixed`, label: stage.label });
     } else if (stage.kind === 'bands') {
       const bands = stage.reversed ? [...eq.bands].reverse() : eq.bands;
-      for (const b of bands) levels.push(stage.label.replace('{band}', b.name));
+      for (const b of bands) levels.push({ key: `${si}:band:${b.id}`, label: stage.label.replace('{band}', b.name) });
     } else {
       const top = Math.min(eq.ladderRungs, stage.max ?? eq.ladderRungs);
-      if (top < 1) continue;
+      if (top < 1) return;
       const rungs = stage.order === 'desc' ? range(top, 1) : range(1, top);
-      for (const r of rungs) levels.push(stage.label.replace('{rung}', String(r)));
+      for (const r of rungs) levels.push({ key: `${si}:rung:${r}`, label: stage.label.replace('{rung}', String(r)) });
     }
-  }
-  return levels.length > 0 ? levels : ['Vücut ağırlığı'];
+  });
+  return levels.length > 0 ? levels : [{ key: 'bodyweight', label: 'Vücut ağırlığı' }];
+}
+
+/** Hareketin aşamalarını kullanıcının ekipmanına göre seviye etiketlerine açar (kolaydan zora). */
+export function buildLadder(ex: ExerciseDef, eq: Equipment): string[] {
+  return ladderEntries(ex, eq).map((l) => l.label);
 }
 
 export function clampLevel(level: number, ladderLength: number): number {

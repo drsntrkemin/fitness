@@ -109,3 +109,38 @@ test('verileri sıfırla iki kez onay ister', async () => {
   expect(confirm).toHaveBeenCalledTimes(2);
   expect((await repo.getSettings()).setupDone).toBe(true);
 });
+
+test('bant silmek onay ister; vazgeçilirse bant kalır', async () => {
+  const user = userEvent.setup();
+  const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
+  renderSettings();
+  await user.click(screen.getByRole('button', { name: 'Kırmızı sil' }));
+  expect(confirm).toHaveBeenCalled();
+  expect((await repo.getSettings()).equipment.bands.map((b) => b.name)).toEqual(['Kırmızı']);
+});
+
+test('ekipman değişince kayıtlı seviyeler aynı banda taşınır', async () => {
+  const user = userEvent.setup();
+  await repo.putExerciseStates({ 'band-squat': { level: 0, targetReps: 10, failStreak: 0 } });
+  renderSettings();
+  // Daha hafif "Sarı" bandı ekle ve en üste taşı: Kırmızı artık 2. sırada.
+  await user.type(screen.getByLabelText('Bant adı'), 'Sarı');
+  await user.click(screen.getByRole('button', { name: 'Ekle' }));
+  await user.click(screen.getByRole('button', { name: 'Sarı yukarı taşı' }));
+  await vi.waitFor(async () => expect((await repo.getSettings()).equipment.bands.map((b) => b.name)).toEqual(['Sarı', 'Kırmızı']));
+  expect((await repo.getExerciseStates())['band-squat']).toEqual({ level: 1, targetReps: 10, failStreak: 0 });
+});
+
+test('kademe sayısı yazarken değil, Kaydet ile değişir', async () => {
+  const user = userEvent.setup();
+  await repo.putExerciseStates({ pushup: { level: 4, targetReps: 9, failStreak: 0 } }); // Eğimli şınav – 6. kademe
+  renderSettings();
+  const rungs = screen.getByLabelText('Kademe sayısı');
+  await user.clear(rungs);
+  await user.type(rungs, '12');
+  expect((await repo.getSettings()).equipment.ladderRungs).toBe(10);
+  await user.click(screen.getByRole('button', { name: 'Kademeyi kaydet' }));
+  await vi.waitFor(async () => expect((await repo.getSettings()).equipment.ladderRungs).toBe(12));
+  // 12 kademede "6. kademe" 6. sırada (12,11,10,9,8,7,6)
+  expect((await repo.getExerciseStates()).pushup.level).toBe(6);
+});

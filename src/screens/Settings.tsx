@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import BandEditor from '../components/BandEditor';
 import TargetsFields, { draftFrom, parseTargets, type TargetsDraft } from '../components/TargetsFields';
 import { BackupError, exportAll, importAll } from '../data/backup';
-import { resetAll, saveSettings } from '../data/repo';
+import { resetAll, saveSettings, updateEquipment } from '../data/repo';
 import { EXERCISES } from '../domain/catalog';
 import { localDateKey } from '../domain/dates';
 import { setsFor } from '../domain/program';
-import type { ExerciseOverride, Settings } from '../domain/types';
+import type { Equipment, ExerciseOverride, Settings } from '../domain/types';
 import * as ios from '../platform/ios';
 import { parseRungs } from './Setup';
 
@@ -66,7 +66,18 @@ export default function SettingsScreen({ settings, onChange, onClose }: Props) {
     onChange();
   };
 
+  /** Ekipman değişikliği: kayıtlı seviyeler yeni merdivene taşınır. */
+  const changeEquipment = async (equipment: Equipment, message?: string) => {
+    const next = { ...s, equipment };
+    const prev = s;
+    setS(next);
+    await updateEquipment(prev, next);
+    if (message) setNotice({ kind: 'ok', text: message });
+    onChange();
+  };
+
   const parsedTargets = parseTargets(targets);
+  const parsedRungs = parseRungs(rungs);
   const errors = EXERCISES.map((ex) => rowError(ex.name, rows[ex.id])).filter((e): e is string => e !== null);
 
   const saveOverrides = () => {
@@ -147,16 +158,17 @@ export default function SettingsScreen({ settings, onChange, onClose }: Props) {
         <section className="card">
           <h2>Ekipman</h2>
           <p className="muted small">Bantlar hafiften ağıra sıralı olmalı.</p>
-          <BandEditor bands={s.equipment.bands} onChange={(bands) => persist({ ...s, equipment: { ...s.equipment, bands } })} />
-          <label className="field">
-            <span>Kademe sayısı</span>
-            <input type="number" inputMode="numeric" min={1} max={30} value={rungs}
-              onChange={(e) => {
-                setRungs(e.target.value);
-                const n = parseRungs(e.target.value);
-                if (n !== null) persist({ ...s, equipment: { ...s.equipment, ladderRungs: n } });
-              }} />
-          </label>
+          <BandEditor confirmDelete bands={s.equipment.bands} onChange={(bands) => changeEquipment({ ...s.equipment, bands })} />
+          <div className="inline-form">
+            <label className="field grow">
+              <span>Kademe sayısı</span>
+              <input type="number" inputMode="numeric" min={1} max={30} value={rungs} onChange={(e) => setRungs(e.target.value)} />
+            </label>
+            <button type="button" className="btn" aria-label="Kademeyi kaydet"
+              disabled={parsedRungs === null || parsedRungs === s.equipment.ladderRungs}
+              onClick={() => parsedRungs !== null && changeEquipment({ ...s.equipment, ladderRungs: parsedRungs }, 'Kademe sayısı kaydedildi.')}>Kaydet</button>
+          </div>
+          {parsedRungs === null && <p className="error">1 ile 30 arasında bir sayı gir.</p>}
         </section>
 
         <section className="card">
