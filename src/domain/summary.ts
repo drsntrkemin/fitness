@@ -1,5 +1,6 @@
 import { EXERCISES } from './catalog';
 import { addDays } from './dates';
+import { num } from './format';
 import { averages } from './nutrition';
 import { buildLadder, clampLevel, repRange, setsFor } from './program';
 import type { DateKey, ExerciseState, Meal, Measurement, Session, Settings } from './types';
@@ -14,7 +15,6 @@ export interface SummaryInput {
 }
 
 const NONE = 'Kayıt yok.';
-const num = (n: number) => n.toLocaleString('tr-TR', { maximumFractionDigits: 1, useGrouping: false });
 const nameOf = (id: string) => EXERCISES.find((e) => e.id === id)?.name ?? id;
 
 /** "Claude'a sor" için panoya kopyalanan düz metin özet (spec §6.5). */

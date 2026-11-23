@@ -4,6 +4,7 @@ import { getSettings } from './data/repo';
 import type { Settings } from './domain/types';
 import { requestPersist } from './platform/ios';
 import SettingsScreen from './screens/Settings';
+import Nutrition from './screens/Nutrition';
 import Setup from './screens/Setup';
 import Workout from './screens/Workout';
 
@@ -33,6 +34,8 @@ export default function App() {
     <div className="app">
       {tab === 'workout' ? (
         <Workout settings={settings} />
+      ) : tab === 'nutrition' ? (
+        <Nutrition settings={settings} />
       ) : (
         <main className="screen">
           <header className="screen-header">
