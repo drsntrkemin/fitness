@@ -67,3 +67,51 @@ export interface Meal extends Macros {
   time: string;
   name: string;
 }
+
+export type Targets = Macros;
+
+export interface Settings {
+  /** Günlük beslenme hedefleri; kurulumda atlanırsa null. */
+  targets: Targets | null;
+  daysPerWeek: 2 | 3;
+  equipment: Equipment;
+  /** hareketId → kullanıcının set/tekrar aralığı ayarı. */
+  overrides: Record<string, ExerciseOverride>;
+  lastBackup: DateKey | null;
+  setupDone: boolean;
+}
+
+export interface SessionExercise {
+  exerciseId: string;
+  /** Merdiven indeksi; -1 = başlangıç seviyesi henüz seçilmedi. */
+  level: number;
+  levelLabel: string;
+  targetReps: number;
+  /** null = set yapılmadı. */
+  sets: (number | null)[];
+}
+
+export interface Session {
+  id?: number;
+  date: DateKey;
+  day: DayKey;
+  status: 'active' | 'done';
+  exercises: SessionExercise[];
+}
+
+export interface Measurement {
+  date: DateKey;
+  weight: number | null;
+  waist: number | null;
+}
+
+export interface BackupFile {
+  app: 'ev-fitness';
+  version: 1;
+  exportedAt: string;
+  settings: Settings;
+  exerciseStates: Record<string, ExerciseState>;
+  sessions: Session[];
+  meals: Meal[];
+  measurements: Measurement[];
+}
