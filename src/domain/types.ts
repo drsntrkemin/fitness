@@ -52,3 +52,18 @@ export interface ExerciseState {
 }
 
 export type ProgressEvent = 'none' | 'reps-up' | 'level-up' | 'level-down' | 'max-level' | 'skipped';
+
+export interface Macros {
+  kcal: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+export interface Meal extends Macros {
+  id?: number;
+  date: DateKey;
+  /** 'HH:MM' */
+  time: string;
+  name: string;
+}
