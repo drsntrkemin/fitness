@@ -51,6 +51,14 @@ export default function SettingsScreen({ settings, onChange, onClose }: Props) {
   const [rows, setRows] = useState(() => rowDrafts(settings));
   const [rungs, setRungs] = useState(String(settings.equipment.ladderRungs));
   const [notice, setNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+  // Yedek metni önceden hazırlanır: iOS paylaşım sayfasını yalnızca dokunuşun hemen ardından açar.
+  const [backupText, setBackupText] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    setBackupText(null);
+    exportAll().then((d) => { if (alive) setBackupText(JSON.stringify(d)); });
+    return () => { alive = false; };
+  }, [settings]);
 
   useEffect(() => {
     setS(settings);
@@ -96,11 +104,18 @@ export default function SettingsScreen({ settings, onChange, onClose }: Props) {
   };
 
   const backup = async () => {
-    const data = await exportAll();
+    if (!backupText) return;
     const today = localDateKey(new Date());
-    const result = await ios.shareFile(`ev-fitness-${today}.json`, JSON.stringify(data));
+    // Paylaşım burada, hiçbir beklemeden önce çağrılır.
+    const result = await ios.shareFile(`ev-fitness-${today}.json`, backupText);
     if (result === 'cancelled') return;
-    await persist({ ...s, lastBackup: today }, result === 'shared' ? 'Yedek paylaşıldı. "Dosyalara Kaydet" ile iCloud\'a kaydetmeyi unutma.' : 'Yedek dosyası indirildi.');
+    if (result === 'downloaded' && !window.confirm('Yedek dosyası telefonuna (Dosyalar / iCloud Drive) kaydedildi mi?')) {
+      setNotice({ kind: 'error', text: 'Yedek kaydedilmedi. Tekrar dene; paylaşım sayfasında "Dosyalara Kaydet"i seç.' });
+      return;
+    }
+    await persist({ ...s, lastBackup: today }, result === 'shared'
+      ? 'Yedek paylaşıldı. "Dosyalara Kaydet" ile iCloud\'a kaydettiysen tamam.'
+      : 'Yedek kaydedildi.');
   };
 
   const restore = async (file: File | undefined) => {
@@ -206,7 +221,7 @@ export default function SettingsScreen({ settings, onChange, onClose }: Props) {
             {' '}{s.lastBackup ? `Son yedek: ${s.lastBackup.split('-').reverse().join('.')}` : 'Henüz yedek alınmadı.'}
           </p>
           <div className="actions">
-            <button type="button" className="btn btn-primary" onClick={backup}>Yedekle</button>
+            <button type="button" className="btn btn-primary" disabled={backupText === null} onClick={backup}>Yedekle</button>
             <label className="btn file-btn">
               Geri yükle
               <input type="file" accept=".json,application/json" aria-label="Yedek dosyası seç"

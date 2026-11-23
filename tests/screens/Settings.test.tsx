@@ -91,13 +91,53 @@ test('geçerli yedek onaylanınca yüklenir', async () => {
   expect(onChange).toHaveBeenCalled();
 });
 
-test('yedekle: dosya paylaşılır/indirilir ve son yedek tarihi güncellenir', async () => {
-  const user = userEvent.setup();
+async function readyBackupButton() {
+  const btn = screen.getByRole('button', { name: 'Yedekle' });
+  await vi.waitFor(() => expect(btn).toBeEnabled());
+  return btn;
+}
+
+test('yedekle: paylaşım dokunuşun içinde, beklemeden açılır', async () => {
+  const { fireEvent } = await import('@testing-library/react');
   const ios = await import('../../src/platform/ios');
   const share = vi.spyOn(ios, 'shareFile').mockResolvedValue('shared');
   renderSettings();
-  await user.click(screen.getByRole('button', { name: 'Yedekle' }));
+  const btn = await readyBackupButton();
+  fireEvent.click(btn);
+  // iOS paylaşımı yalnızca dokunuşun hemen ardından açar: araya veritabanı beklemesi girmemeli.
   expect(share).toHaveBeenCalledWith(expect.stringMatching(/^ev-fitness-\d{4}-\d{2}-\d{2}\.json$/), expect.stringContaining('"app":"ev-fitness"'));
+  await vi.waitFor(async () => expect((await repo.getSettings()).lastBackup).toMatch(/^\d{4}-\d{2}-\d{2}$/));
+});
+
+test('yedekle: paylaşım iptal edilirse son yedek tarihi değişmez', async () => {
+  const user = userEvent.setup();
+  const ios = await import('../../src/platform/ios');
+  vi.spyOn(ios, 'shareFile').mockResolvedValue('cancelled');
+  renderSettings();
+  await user.click(await readyBackupButton());
+  await new Promise((r) => setTimeout(r, 50));
+  expect((await repo.getSettings()).lastBackup).toBeNull();
+});
+
+test('yedekle: dosya yalnızca indirildiyse kaydedildiği sorulur; hayır denirse tarih değişmez', async () => {
+  const user = userEvent.setup();
+  const ios = await import('../../src/platform/ios');
+  vi.spyOn(ios, 'shareFile').mockResolvedValue('downloaded');
+  const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
+  renderSettings();
+  await user.click(await readyBackupButton());
+  await vi.waitFor(() => expect(confirm).toHaveBeenCalled());
+  await new Promise((r) => setTimeout(r, 50));
+  expect((await repo.getSettings()).lastBackup).toBeNull();
+});
+
+test('yedekle: indirilen dosya kaydedildi denirse tarih güncellenir', async () => {
+  const user = userEvent.setup();
+  const ios = await import('../../src/platform/ios');
+  vi.spyOn(ios, 'shareFile').mockResolvedValue('downloaded');
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+  renderSettings();
+  await user.click(await readyBackupButton());
   await vi.waitFor(async () => expect((await repo.getSettings()).lastBackup).toMatch(/^\d{4}-\d{2}-\d{2}$/));
 });
 
