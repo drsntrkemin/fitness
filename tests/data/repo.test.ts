@@ -72,6 +72,12 @@ describe('oturumlar', () => {
     expect(await repo.lastFinishedDay()).toBe('B');
   });
 
+  test('deleteSession oturumu siler', async () => {
+    const id = await repo.saveSession(session());
+    await repo.deleteSession(id);
+    expect(await repo.getActiveSession()).toBeUndefined();
+  });
+
   test('aynı gün iki oturumda son biten belirleyicidir', async () => {
     await repo.saveSession(session({ day: 'A', status: 'done' }));
     await repo.saveSession(session({ day: 'B', status: 'done' }));

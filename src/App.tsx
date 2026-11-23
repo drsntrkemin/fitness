@@ -5,6 +5,7 @@ import type { Settings } from './domain/types';
 import { requestPersist } from './platform/ios';
 import SettingsScreen from './screens/Settings';
 import Setup from './screens/Setup';
+import Workout from './screens/Workout';
 
 const TITLES: Record<Tab, string> = { today: 'Bugün', workout: 'Antrenman', nutrition: 'Beslenme', progress: 'İlerleme' };
 
@@ -30,14 +31,18 @@ export default function App() {
 
   return (
     <div className="app">
-      <main className="screen">
-        <header className="screen-header">
-          <h1>{TITLES[tab]}</h1>
-          {tab === 'today' && (
-            <button type="button" className="icon-btn" aria-label="Ayarlar" onClick={() => setShowSettings(true)}>⚙</button>
-          )}
-        </header>
-      </main>
+      {tab === 'workout' ? (
+        <Workout settings={settings} />
+      ) : (
+        <main className="screen">
+          <header className="screen-header">
+            <h1>{TITLES[tab]}</h1>
+            {tab === 'today' && (
+              <button type="button" className="icon-btn" aria-label="Ayarlar" onClick={() => setShowSettings(true)}>⚙</button>
+            )}
+          </header>
+        </main>
+      )}
       <TabBar tab={tab} onChange={setTab} />
     </div>
   );

@@ -23,3 +23,9 @@ test('daysBetween b − a gün sayısını verir', () => {
   expect(daysBetween('2026-11-23', '2026-11-16')).toBe(-7);
   expect(daysBetween('2026-03-28', '2026-03-30')).toBe(2);
 });
+
+test('formatDay tarihi Türkçe kısa biçimde yazar', async () => {
+  const { formatDay } = await import('../../src/domain/dates');
+  expect(formatDay('2026-11-20')).toBe('20 Kas Cum');
+  expect(formatDay('2026-11-23', { long: true })).toBe('23 Kasım Pazartesi');
+});

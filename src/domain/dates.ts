@@ -23,3 +23,10 @@ export function addDays(key: DateKey, n: number): DateKey {
 export function daysBetween(a: DateKey, b: DateKey): number {
   return Math.round((toNoon(b).getTime() - toNoon(a).getTime()) / 86_400_000);
 }
+
+/** Gün anahtarını Türkçe yazar: kısa "20 Kas Cum", uzun "23 Kasım Pazartesi". */
+export function formatDay(key: DateKey, opts: { long?: boolean } = {}): string {
+  return toNoon(key).toLocaleDateString('tr-TR', opts.long
+    ? { day: 'numeric', month: 'long', weekday: 'long' }
+    : { day: 'numeric', month: 'short', weekday: 'short' });
+}

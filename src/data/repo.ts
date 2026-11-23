@@ -44,6 +44,10 @@ export async function saveSession(s: Session): Promise<number> {
   return (await db.sessions.put(s)) as number;
 }
 
+export async function deleteSession(id: number): Promise<void> {
+  await db.sessions.delete(id);
+}
+
 /** Bitmiş oturumlar, en yeniden eskiye. */
 export async function listSessions(fromDate?: DateKey): Promise<Session[]> {
   const done = await db.sessions.where('status').equals('done').toArray();
