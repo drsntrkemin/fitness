@@ -181,6 +181,26 @@ ve set sayılarını etkiler: 2 günde ana hareketler 4 set, 3 günde 3 set.
 | Bantlı hip thrust | 8–12 | Bantlar hafiften ağıra |
 | Bantlı Pallof press | 8–12 (her taraf) | Bantlar hafiften ağıra |
 
+**Ek 1 (2026-11-23, kullanıcı onayıyla): görünüm hedefi için ek hareketler ve merdiven devamları**
+
+Kullanıcının hedefi "kaslı ve şekilli" görünüm. İlk programda göğüs haftada ~4,5 set, yan omuz ve kollar
+doğrudan hiç çalışmıyordu. Her güne iki **yardımcı hareket** eklenir. Bunlar günün sonunda, ikişer süperset
+olarak yapılır; tekrar aralığı 10–15, haftada 2 günde de 3 set (karın hareketleri gibi):
+
+| Gün | Hareket | Tekrar | Zorluk merdiveni |
+|---|---|---|---|
+| A | Bantlı lateral raise | 10–15 | Bantlar hafiften ağıra |
+| A | Bantlı biceps curl | 10–15 | Bantlar hafiften ağıra |
+| B | Bantlı göğüs fly (merdivene bağlı) | 10–15 | Bantlar hafiften ağıra |
+| B | Bantlı triceps pushdown (merdivenin üstüne bağlı) | 10–15 | Bantlar hafiften ağıra |
+
+Bantlar zamanla bacak ve omuz press için hafif kalacağı için iki merdiven **sonuna** aşama eklenir (sona
+eklendiği için mevcut seviyeler kaymaz):
+- Bantlı squat → … en ağır bant → Bulgar split squat (arka ayak merdivende, her bacak) → Merdivene tutunarak tek bacak squat (her bacak)
+- Bantlı omuz press → … en ağır bant → Pike şınav (ayaklar yerde) → Pike şınav – ayaklar 1.–3. kademede (güvenlik için en fazla 3. kademe)
+
+Yeni sürüm indiğinde ana ekran uygulaması kendini bir kez yeniler (her set dokunuşta kaydedildiği için güvenli).
+
 Merdivenler, kurulumda girilen ekipmandan **otomatik üretilir**. Örneğin kullanıcının 4 bandı ve
 10 kademesi varsa "Bantlı squat" 4 seviyeli, "Ters row" 10 seviyeli olur.
 Bant destekli barfiks, bantları ters sırada kullanır (en ağır bant en çok destek verir, en kolay seviyedir).
