@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import MealForm from '../components/MealForm';
 import MeasurementForm from '../components/MeasurementForm';
+import NextWorkoutCard from '../components/NextWorkoutCard';
 import ProgressBar from '../components/ProgressBar';
 import * as repo from '../data/repo';
 import { daysBetween, formatDay, localDateKey, weekStart } from '../domain/dates';
@@ -19,7 +20,8 @@ interface Props {
 }
 
 interface Data {
-  hasActive: boolean;
+  /** Açık antrenmanın günü; yoksa null. */
+  activeDay: DayKey | null;
   next: DayKey;
   weekCount: number;
   totals: Macros;
@@ -45,7 +47,7 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onCont
     ]);
     const lastM = measurements.at(-1);
     setData({
-      hasActive: !!active,
+      activeDay: active?.day ?? null,
       next: nextDay(last),
       weekCount: sessions.filter((s) => s.date >= weekStart(today)).length,
       totals: dayTotals(meals.filter((m) => m.date === today)),
@@ -87,20 +89,17 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onCont
         <button type="button" className="icon-btn" aria-label="Ayarlar" onClick={onOpenSettings}>⚙</button>
       </header>
 
-      <section className="card workout-card">
-        {data.hasActive ? (
-          <>
-            <h2>Antrenman devam ediyor</h2>
-            <button type="button" className="btn btn-primary btn-block" onClick={onContinueWorkout}>Devam et</button>
-          </>
-        ) : (
-          <>
-            <h2>{`Sıradaki: Antrenman ${data.next} (${exercisesFor(data.next).length} hareket)`}</h2>
-            <button type="button" className="btn btn-primary btn-block" onClick={onStartWorkout}>Başla</button>
-          </>
-        )}
-        <p className="muted small week-count">{`Bu hafta ${data.weekCount} / ${settings.daysPerWeek} antrenman`}</p>
-      </section>
+      {data.activeDay ? (
+        <NextWorkoutCard day={data.activeDay} title="Antrenman devam ediyor" subtitle={`Antrenman ${data.activeDay}`}
+          actionLabel="Devam et" onAction={onContinueWorkout}>
+          <p className="small week-count">{`Bu hafta ${data.weekCount} / ${settings.daysPerWeek} antrenman`}</p>
+        </NextWorkoutCard>
+      ) : (
+        <NextWorkoutCard day={data.next} title={`Sıradaki: Antrenman ${data.next} (${exercisesFor(data.next).length} hareket)`}
+          actionLabel="Başla" onAction={onStartWorkout}>
+          <p className="small week-count">{`Bu hafta ${data.weekCount} / ${settings.daysPerWeek} antrenman`}</p>
+        </NextWorkoutCard>
+      )}
 
       <section className="card">
         <ProgressBar label="Kalori" value={data.totals.kcal} target={tg?.kcal ?? null} unit="kcal" />

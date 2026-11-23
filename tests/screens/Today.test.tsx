@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Today from '../../src/screens/Today';
 import * as repo from '../../src/data/repo';
@@ -88,6 +88,20 @@ describe('antrenman kartı', () => {
     const props = renderToday();
     await user.click(await screen.findByRole('button', { name: 'Devam et' }));
     expect(props.onContinueWorkout).toHaveBeenCalled();
+  });
+
+  test('sıradaki antrenman kartında o günün kas figürü var', async () => {
+    renderToday();
+    const card = (await screen.findByText('Sıradaki: Antrenman A (7 hareket)')).closest('section')!;
+    expect(within(card).getByRole('img', { name: /^Ön: .*Göğüs/ })).toBeInTheDocument();
+  });
+
+  test('antrenman devam ederken o oturumun gününün kasları gösterilir', async () => {
+    await repo.saveSession({ ...done(today, 'B'), status: 'active' });
+    renderToday();
+    const card = (await screen.findByText('Antrenman devam ediyor')).closest('section')!;
+    expect(within(card).getByRole('img', { name: /^Arka: .*Üst sırt/ })).toBeInTheDocument();
+    expect(within(card).getByRole('button', { name: 'Devam et' })).toBeInTheDocument();
   });
 
   test('bu hafta tamamlanan antrenman sayısını hedefle gösterir', async () => {
