@@ -4,12 +4,11 @@ import { getSettings } from './data/repo';
 import type { Settings } from './domain/types';
 import { requestPersist } from './platform/ios';
 import Nutrition from './screens/Nutrition';
+import Progress from './screens/Progress';
 import SettingsScreen from './screens/Settings';
 import Setup from './screens/Setup';
 import Today from './screens/Today';
 import Workout from './screens/Workout';
-
-const TITLES: Record<Tab, string> = { today: 'Bugün', workout: 'Antrenman', nutrition: 'Beslenme', progress: 'İlerleme' };
 
 export default function App() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -46,11 +45,7 @@ export default function App() {
       )}
       {tab === 'workout' && <Workout settings={settings} autoStart={autoStart} />}
       {tab === 'nutrition' && <Nutrition settings={settings} />}
-      {tab === 'progress' && (
-        <main className="screen">
-          <header className="screen-header"><h1>{TITLES.progress}</h1></header>
-        </main>
-      )}
+      {tab === 'progress' && <Progress settings={settings} />}
       <TabBar tab={tab} onChange={(t) => go(t)} />
     </div>
   );

@@ -47,7 +47,7 @@ describe('haftalık ölçüm kartı', () => {
     await user.type(screen.getByLabelText('Kilo (kg)'), '78,4');
     await user.click(screen.getByRole('button', { name: 'Ölçümü kaydet' }));
     await vi.waitFor(async () => expect((await repo.listMeasurements()).at(-1)).toEqual({ date: today, weight: 78.4, waist: null }));
-    expect(screen.queryByRole('heading', { name: 'Haftalık ölçüm' })).not.toBeInTheDocument();
+    await vi.waitFor(() => expect(screen.queryByRole('heading', { name: 'Haftalık ölçüm' })).not.toBeInTheDocument());
   });
 });
 

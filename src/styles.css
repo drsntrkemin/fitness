@@ -238,3 +238,24 @@ select {
 .ask-card .notice { margin: 8px 0 0; }
 .ask-card a { color: inherit; font-weight: 700; }
 .summary-box { width: 100%; font: inherit; font-size: 0.8rem; margin-top: 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+
+/* ── İlerleme ── */
+.chart { width: 100%; height: auto; display: block; margin-top: 4px; }
+.chart-line { stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.chart-dot { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
+.chart-grid { stroke: var(--border); stroke-dasharray: 3 4; }
+.chart-label { fill: var(--muted); font-size: 11px; }
+.measure-summary { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 4px; font-weight: 600; }
+.diff { font-weight: 700; color: var(--muted); }
+.diff.down { color: var(--ok); }
+.diff.up { color: #b45309; }
+.segmented + .list, .segmented + p { margin-top: 12px; }
+.stat-row { padding: 8px 0; }
+.stat-value { font-weight: 700; font-variant-numeric: tabular-nums; }
+.history-item { border-bottom: 1px solid var(--border); }
+.history-item:last-child { border-bottom: 0; }
+.history-toggle { display: flex; align-items: center; width: 100%; min-height: 48px; border: 0; background: none; text-align: left; font-weight: 600; cursor: pointer; padding: 0; }
+.history-list { list-style: none; margin: 0 0 10px; padding: 0; }
+.history-row { display: flex; align-items: baseline; gap: 10px; padding: 4px 0; font-size: 0.9rem; }
+.history-row .muted { min-width: 76px; }
+.history-sets { font-weight: 700; font-variant-numeric: tabular-nums; }

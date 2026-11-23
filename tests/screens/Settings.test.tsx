@@ -30,7 +30,7 @@ test('protein hedefi değiştirilip kaydedilir', async () => {
   await user.clear(protein);
   await user.type(protein, '160');
   await user.click(screen.getByRole('button', { name: 'Hedefleri kaydet' }));
-  expect((await repo.getSettings()).targets?.protein).toBe(160);
+  await vi.waitFor(async () => expect((await repo.getSettings()).targets?.protein).toBe(160));
   expect(onChange).toHaveBeenCalled();
 });
 
@@ -38,7 +38,7 @@ test('haftalık gün sayısı 2 seçilince kaydedilir', async () => {
   const user = userEvent.setup();
   renderSettings();
   await user.click(screen.getByRole('radio', { name: 'Haftada 2 gün' }));
-  expect((await repo.getSettings()).daysPerWeek).toBe(2);
+  await vi.waitFor(async () => expect((await repo.getSettings()).daysPerWeek).toBe(2));
 });
 
 test('hareket tekrar aralığında alt sınır üst sınırdan küçük olmalı', async () => {
@@ -62,7 +62,7 @@ test('geçerli tekrar aralığı ve set sayısı kaydedilir', async () => {
   await user.clear(sets);
   await user.type(sets, '4');
   await user.click(screen.getByRole('button', { name: 'Hareket ayarlarını kaydet' }));
-  expect((await repo.getSettings()).overrides['band-squat']).toEqual({ repMin: 8, repMax: 15, sets: 4 });
+  await vi.waitFor(async () => expect((await repo.getSettings()).overrides['band-squat']).toEqual({ repMin: 8, repMax: 15, sets: 4 }));
   // Varsayılanında bırakılan hareketler için ayar yazılmaz.
   expect((await repo.getSettings()).overrides['pullup']).toBeUndefined();
 });
@@ -98,7 +98,7 @@ test('yedekle: dosya paylaşılır/indirilir ve son yedek tarihi güncellenir', 
   renderSettings();
   await user.click(screen.getByRole('button', { name: 'Yedekle' }));
   expect(share).toHaveBeenCalledWith(expect.stringMatching(/^ev-fitness-\d{4}-\d{2}-\d{2}\.json$/), expect.stringContaining('"app":"ev-fitness"'));
-  expect((await repo.getSettings()).lastBackup).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  await vi.waitFor(async () => expect((await repo.getSettings()).lastBackup).toMatch(/^\d{4}-\d{2}-\d{2}$/));
 });
 
 test('verileri sıfırla iki kez onay ister', async () => {
