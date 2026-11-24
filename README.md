@@ -43,7 +43,7 @@ Sıradaki antrenman kartındaki karakter, tamamladığın antrenmanlarla büyür
 
 ### Barfiks barı yoksa ve seyahatte
 
-- **Barfiks barı:** Ayarlar (⚙) → Program → **Barfiks barım var**. Kapalıyken (varsayılan) barfiksin yerine **bantlı eğilerek row** yapılır. Barı kurunca aç; barfiks kaldığı seviyeden devam eder.
+- **Barfiks barı:** Ayarlar (⚙) → Program → **Barfiks barı: Var / Yok**. **Yok** seçiliyken (varsayılan) barfiksin yerine **bantlı eğilerek row** yapılır. Açık bir antrenman varsa o da hemen güncellenir. Antrenman sırasında Barfiks kartındaki **Barım yok, bantlı row yap** düğmesi de aynı işi yapar. Barı kurunca **Var**'ı seç; barfiks kaldığı seviyeden devam eder.
 - **Seyahat modu:** Sıradaki antrenman kartında **🧳 Seyahatte başla**. Yalnız bantlarla, yukarıdan bağlantı olmadan yapılır: ters row → bantlı oturarak row, şınav → dizüstü/yer/bantlı şınav, asılı bacak kaldırma → yerde bacak kaldırma, Pallof press → ölü böcek, göğüs fly → bantlı fly (bant sırttan), triceps pushdown → bantlı baş üstü triceps. Diğer bantlı hareketler aynen kalır. Seyahat hareketlerinin seviyeleri ayrı tutulur; A/B sırası iki modda ortaktır.
 
 ## Yedekleme

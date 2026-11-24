@@ -17,8 +17,11 @@ başka bantlı hareketle karşılanmalı.
 3. Ayrı bir "seyahat programı" (C günü). Elendi: A/B dengesi ve haftalık kas hacmi bozulur.
 
 ## Tasarım
-- **Ayar:** `hasPullupBar` (varsayılan **kapalı**). Ayarlar → Program bölümünde "Barfiks barım var" anahtarı.
-  Kapalıyken barfiks yerine **Bantlı eğilerek row** gelir (evde ve seyahatte).
+- **Ayar:** `hasPullupBar` (varsayılan **kapalı**). Ayarlar → Program bölümünde "Barfiks barı: Var / Yok" seçimi.
+  Kapalıyken barfiks yerine **Bantlı eğilerek row** gelir (evde ve seyahatte). Ayar değişince açık antrenmandaki
+  henüz set girilmemiş barfiks/row da hemen değişir. Antrenmanda barfiks kartında "Barım yok, bantlı row yap" kısayolu.
+  (İlk sürümdeki onay kutusu, genel giriş stili yüzünden bozuk göründüğü ve açık antrenmanı değiştirmediği için
+  2026-11-24'te bu hale getirildi.)
 - **Mod:** Antrenman başlarken "Başla" (evde) ya da "Seyahatte başla". Oturuma `mode: 'home' | 'travel'` yazılır
   (eski oturumlar = evde). A/B sırası iki modda ortak.
 - **Seyahatte yedekler** (merdiven ya da yukarıdan bağlantı gerektirenler):
