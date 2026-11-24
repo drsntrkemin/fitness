@@ -98,3 +98,10 @@ test('sabit soruyla biter', () => {
   expect(buildClaudeSummary(input()).trimEnd().split('\n').at(-1))
     .toBe('Bu verilere bakarak programımı ve beslenmemi nasıl ayarlamalıyım?');
 });
+
+test('hiç yapılmamış yedek (seyahat) hareketleri seviye listesinde yer almaz; yapılanlar yer alır', () => {
+  const text = buildClaudeSummary(input());
+  expect(text).not.toContain('Ölü böcek');
+  const withTravel = buildClaudeSummary(input({ states: { 'dead-bug': { level: 0, targetReps: 9, failStreak: 0 } } }));
+  expect(withTravel).toContain('Ölü böcek: Ölü böcek, hedef 3 × 9 (her taraf) (aralık 8–12)');
+});

@@ -47,6 +47,7 @@ export function buildClaudeSummary(input: SummaryInput): string {
   lines.push('', '## Hareketlerin şu anki seviyesi');
   for (const ex of EXERCISES) {
     const st = states[ex.id];
+    if (!st && ex.substitute) continue; // hiç yapılmamış yedek hareket: listeyi kalabalıklaştırma
     if (!st) {
       lines.push(`${ex.name}: başlangıç seviyesi seçilmedi`);
       continue;
