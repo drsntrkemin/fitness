@@ -20,17 +20,36 @@ export function createSession(
   day: DayKey, date: DateKey, settings: Settings, states: Record<string, ExerciseState>, mode: WorkoutMode = 'home',
 ): Session {
   const plan = planExercises(day, { mode, hasPullupBar: settings.hasPullupBar });
-  const exercises: SessionExercise[] = plan.map((ex) => {
-    const ladder = buildLadder(ex, settings.equipment);
-    const { repMin, repMax } = repRange(ex, settings.overrides[ex.id]);
-    const sets = Array<number | null>(setsFor(ex, settings.daysPerWeek, settings.overrides[ex.id])).fill(null);
-    const st = states[ex.id];
-    if (!st) return { exerciseId: ex.id, level: -1, levelLabel: '', targetReps: repMin, sets };
-    const level = clampLevel(st.level, ladder.length);
-    const targetReps = Math.max(repMin, Math.min(st.targetReps, repMax));
-    return { exerciseId: ex.id, level, levelLabel: ladder[level], targetReps, sets };
-  });
+  const exercises = plan.map((ex) => sessionEntry(ex, settings, states));
   return { date, day, status: 'active', mode, exercises };
+}
+
+/** Bir hareketin oturum satırı: kayıtlı seviye ve hedef (yoksa seviye -1), boş setler. */
+function sessionEntry(ex: ExerciseDef, settings: Settings, states: Record<string, ExerciseState>): SessionExercise {
+  const ladder = buildLadder(ex, settings.equipment);
+  const { repMin, repMax } = repRange(ex, settings.overrides[ex.id]);
+  const sets = Array<number | null>(setsFor(ex, settings.daysPerWeek, settings.overrides[ex.id])).fill(null);
+  const st = states[ex.id];
+  if (!st) return { exerciseId: ex.id, level: -1, levelLabel: '', targetReps: repMin, sets };
+  const level = clampLevel(st.level, ladder.length);
+  const targetReps = Math.max(repMin, Math.min(st.targetReps, repMax));
+  return { exerciseId: ex.id, level, levelLabel: ladder[level], targetReps, sets };
+}
+
+/**
+ * Barfiks barı ayarı değişince açık (evdeki) antrenmanda barfiks ↔ bantlı eğilerek row yer değiştirir.
+ * Seti girilmiş hareket değişmez; seyahat oturumu zaten barsızdır.
+ */
+export function swapPullup(s: Session, settings: Settings, states: Record<string, ExerciseState>): Session {
+  if (s.mode === 'travel') return s;
+  const want = settings.hasPullupBar ? 'pullup' : 'band-bent-row';
+  const other = settings.hasPullupBar ? 'band-bent-row' : 'pullup';
+  return {
+    ...s,
+    exercises: s.exercises.map((e) => (e.exerciseId === other && e.sets.every((v) => v === null)
+      ? sessionEntry(defOf(want), settings, states)
+      : e)),
+  };
 }
 
 const mapExercise = (s: Session, id: string, fn: (e: SessionExercise) => SessionExercise): Session => ({

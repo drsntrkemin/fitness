@@ -287,3 +287,26 @@ describe('seyahat modu ve barsız program', () => {
     expect(within(card).getByRole('img', { name: /^Arka: Kanat, Üst sırt/ })).toBeInTheDocument();
   });
 });
+
+test('antrenmandaki "Barım yok, bantlı row yap" barfiksi hemen değiştirir ve ayarı kaydeder', async () => {
+  const user = userEvent.setup();
+  const onSettingsChange = vi.fn();
+  await repo.saveSettings(settings);
+  await repo.saveSession(active());
+  render(<Workout settings={settings} onSettingsChange={onSettingsChange} />);
+  const card = (await screen.findByRole('heading', { name: 'Barfiks' })).closest('section')!;
+  await user.click(within(card).getByRole('button', { name: 'Barım yok, bantlı row yap' }));
+  expect(await screen.findByRole('heading', { name: 'Bantlı eğilerek row' })).toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: 'Barfiks' })).not.toBeInTheDocument();
+  expect((await repo.getSettings()).hasPullupBar).toBe(false);
+  expect(onSettingsChange).toHaveBeenCalled();
+});
+
+test('seti girilmiş barfikste "Barım yok" kısayolu gösterilmez', async () => {
+  await repo.saveSession(active({ exercises: [
+    { exerciseId: 'pullup', level: 1, levelLabel: 'Bant destekli (Kırmızı)', targetReps: 4, sets: [4, null, null] },
+  ] }));
+  render(<Workout settings={settings} />);
+  const card = (await screen.findByRole('heading', { name: 'Barfiks' })).closest('section')!;
+  expect(within(card).queryByRole('button', { name: 'Barım yok, bantlı row yap' })).not.toBeInTheDocument();
+});

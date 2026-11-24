@@ -185,11 +185,14 @@ test('kademe sayısı yazarken değil, Kaydet ile değişir', async () => {
   expect((await repo.getExerciseStates()).pushup.level).toBe(6);
 });
 
-test('"Barfiks barım var" anahtarı kaydedilir', async () => {
+test('barfiks barı "Var / Yok" seçimi kaydedilir ve açık antrenmana hemen uygulanır', async () => {
   const user = userEvent.setup();
-  renderSettings();
-  const toggle = screen.getByRole('checkbox', { name: 'Barfiks barım var' });
-  expect(toggle).not.toBeChecked();
-  await user.click(toggle);
-  await vi.waitFor(async () => expect((await repo.getSettings()).hasPullupBar).toBe(true));
+  await repo.saveSession({ date: '2026-11-24', day: 'A', status: 'active', exercises: [
+    { exerciseId: 'pullup', level: 0, levelLabel: 'Negatif barfiks (yavaş iniş)', targetReps: 4, sets: [null, null, null] },
+  ] });
+  renderSettings({ ...base, hasPullupBar: true });
+  expect(screen.getByRole('radio', { name: 'Barfiks barım var' })).toBeChecked();
+  await user.click(screen.getByRole('radio', { name: 'Barfiks barım yok' }));
+  await vi.waitFor(async () => expect((await repo.getSettings()).hasPullupBar).toBe(false));
+  expect((await repo.getActiveSession())?.exercises[0].exerciseId).toBe('band-bent-row');
 });

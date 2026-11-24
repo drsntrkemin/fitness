@@ -44,7 +44,7 @@ export default function App() {
           onStartWorkout={() => go('workout', 'home')} onStartTravelWorkout={() => go('workout', 'travel')}
           onContinueWorkout={() => go('workout')} />
       )}
-      {tab === 'workout' && <Workout settings={settings} autoStart={autoStart} />}
+      {tab === 'workout' && <Workout settings={settings} autoStart={autoStart} onSettingsChange={reload} />}
       {tab === 'nutrition' && <Nutrition settings={settings} />}
       {tab === 'progress' && <Progress settings={settings} />}
       <TabBar tab={tab} onChange={(t) => go(t)} />

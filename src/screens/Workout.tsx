@@ -17,6 +17,8 @@ interface Props {
   autoStart?: boolean | WorkoutMode;
   /** Oturum başladı/bitti/silindi; üst bileşen gerekirse yenilenir. */
   onSessionChange?: () => void;
+  /** Ayarlar burada değişti (ör. "Barım yok"); uygulama ayarları yeniden okumalı. */
+  onSettingsChange?: () => void;
 }
 
 type Idle = { states: Record<string, ExerciseState>; next: DayKey; recent: Session[]; completed: number };
@@ -28,7 +30,7 @@ type View =
 
 const nameOf = (id: string) => EXERCISES.find((e) => e.id === id)?.name ?? id;
 
-export default function Workout({ settings, autoStart, onSessionChange }: Props) {
+export default function Workout({ settings, autoStart, onSessionChange, onSettingsChange }: Props) {
   const [view, setView] = useState<View>({ kind: 'loading' });
   const [session, setSession] = useState<Session | null>(null);
   const sessionRef = useRef<Session | null>(null);
@@ -104,6 +106,14 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
     onSessionChange?.();
   });
 
+  /** Antrenmanın içinden "bar yok": ayarı kaydet, açık antrenmanda barfiksi bantlı row yap. */
+  const noBar = () => guard(async () => {
+    await repo.updatePullupBar({ ...settings, hasPullupBar: false });
+    const fresh = await repo.getActiveSession();
+    if (fresh) showSession(fresh);
+    onSettingsChange?.();
+  });
+
   const cancel = () => guard(async () => {
     const s = sessionRef.current;
     if (!s?.id) return;
@@ -148,6 +158,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
         </header>
         {session.exercises.map((e) => (
           <ExerciseCard key={e.exerciseId} entry={e} settings={settings}
+            onNoBar={e.exerciseId === 'pullup' && e.sets.every((v) => v === null) ? noBar : undefined}
             onPick={(level) => apply((s) => chooseLevel(s, e.exerciseId, level, settings))}
             onSet={(i, v) => apply((s) => setRep(s, e.exerciseId, i, v))} />
         ))}
@@ -215,11 +226,13 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
 interface CardProps {
   entry: SessionExercise;
   settings: Settings;
+  /** Yalnız set girilmemiş barfikste: "Barım yok, bantlı row yap". */
+  onNoBar?: () => void;
   onPick: (level: number) => void;
   onSet: (index: number, value: number | null) => void;
 }
 
-function ExerciseCard({ entry, settings, onPick, onSet }: CardProps) {
+function ExerciseCard({ entry, settings, onNoBar, onPick, onSet }: CardProps) {
   const ex = EXERCISES.find((x) => x.id === entry.exerciseId)!;
   const ladder = buildLadder(ex, settings.equipment);
   const { repMin, repMax } = repRange(ex, settings.overrides[ex.id]);
@@ -263,6 +276,9 @@ function ExerciseCard({ entry, settings, onPick, onSet }: CardProps) {
         <div className="ex-map"><BodyMap muscles={ex.muscles} size={84} /></div>
       </div>
       {showHow && <p className="howto">{ex.howTo}</p>}
+      {onNoBar && (
+        <button type="button" className="link-btn no-bar" onClick={onNoBar}>Barım yok, bantlı row yap</button>
+      )}
       {unset ? picker('Başlangıç seviyeni seç') : (
         <>
           <div className="ex-level">

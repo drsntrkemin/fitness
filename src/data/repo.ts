@@ -1,6 +1,7 @@
 // Tüm kalıcı veri erişimi bu modülden geçer (spec §4: ileride bulut senkronuna geçişi kolaylaştırır).
 import { db } from './db';
 import { remapSession, remapStates } from '../domain/remap';
+import { swapPullup } from '../domain/session';
 import type { DateKey, DayKey, ExerciseState, Meal, Measurement, Session, Settings } from '../domain/types';
 
 export const DEFAULT_SETTINGS: Settings = Object.freeze({
@@ -37,6 +38,17 @@ export async function updateEquipment(prev: Settings, next: Settings): Promise<v
     await db.exerciseStates.bulkPut(Object.entries(moved).map(([id, st]) => ({ id, ...st })));
     const active = await db.sessions.where('status').equals('active').toArray();
     for (const s of active) await db.sessions.put(remapSession(s, prev.equipment, next.equipment));
+    await db.settings.put({ key: 'main', value: next });
+  });
+}
+
+/** Barfiks barı ayarını kaydeder ve açık antrenmana hemen uygular (barfiks ↔ bantlı row) — tek işlemde. */
+export async function updatePullupBar(next: Settings): Promise<void> {
+  await db.transaction('rw', [db.settings, db.exerciseStates, db.sessions], async () => {
+    const rows = await db.exerciseStates.toArray();
+    const states = Object.fromEntries(rows.map(({ id, ...st }) => [id, st]));
+    const active = await db.sessions.where('status').equals('active').toArray();
+    for (const s of active) await db.sessions.put(swapPullup(s, next, states));
     await db.settings.put({ key: 'main', value: next });
   });
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import BandEditor from '../components/BandEditor';
 import TargetsFields, { draftFrom, parseTargets, type TargetsDraft } from '../components/TargetsFields';
 import { BackupError, exportAll, importAll } from '../data/backup';
-import { resetAll, saveSettings, updateEquipment } from '../data/repo';
+import { resetAll, saveSettings, updateEquipment, updatePullupBar } from '../data/repo';
 import { EXERCISES } from '../domain/catalog';
 import { localDateKey } from '../domain/dates';
 import { setsFor } from '../domain/program';
@@ -168,12 +168,24 @@ export default function SettingsScreen({ settings, onChange, onClose }: Props) {
             ))}
           </div>
           <p className="muted small">Haftada 2 günde ana hareketler 4 set olur.</p>
-          <label className="toggle-row">
-            <input type="checkbox" checked={s.hasPullupBar}
-              onChange={(e) => persist({ ...s, hasPullupBar: e.target.checked })} />
-            <span>Barfiks barım var</span>
-          </label>
-          <p className="muted small">Kapalıyken barfiksin yerine bantlı eğilerek row yapılır. Barı kurunca aç; barfiks kaldığı seviyeden devam eder.</p>
+          <p className="field-label">Barfiks barı</p>
+          <div className="segmented" role="radiogroup" aria-label="Barfiks barı">
+            {([true, false] as const).map((has) => (
+              <label key={String(has)} className={s.hasPullupBar === has ? 'seg active' : 'seg'}>
+                <input type="radio" name="pullup-bar" checked={s.hasPullupBar === has}
+                  aria-label={has ? 'Barfiks barım var' : 'Barfiks barım yok'}
+                  onChange={async () => {
+                    const next = { ...s, hasPullupBar: has };
+                    setS(next);
+                    await updatePullupBar(next);
+                    setNotice({ kind: 'ok', text: has ? 'Barfiks programa eklendi.' : 'Barfiks yerine bantlı eğilerek row yapılacak.' });
+                    onChange();
+                  }} />
+                {has ? 'Var' : 'Yok'}
+              </label>
+            ))}
+          </div>
+          <p className="muted small">Bar yoksa barfiksin yerine bantlı eğilerek row yapılır. Açık antrenmanın da hemen güncellenir. Barı kurunca "Var"ı seç; barfiks kaldığı seviyeden devam eder.</p>
         </section>
 
         <section className="card">

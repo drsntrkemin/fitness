@@ -61,3 +61,34 @@ test('oturum modu ve hareketleri plana göre kurulur', () => {
   expect(s.exercises.map((e) => e.exerciseId)[0]).toBe('band-seated-row');
   expect(createSession('A', '2026-11-24', settings, {}).mode).toBe('home');
 });
+
+describe('açık antrenmanda barfiks ↔ bantlı row geçişi', () => {
+  const base: Settings = { ...structuredClone(DEFAULT_SETTINGS), setupDone: true,
+    equipment: { bands: [{ id: 'b1', name: 'Sarı' }, { id: 'b2', name: 'Kırmızı' }], ladderRungs: 10 } };
+
+  test('bar yok seçilince set girilmemiş barfiks, bantlı eğilerek row olur (kayıtlı seviyesiyle)', async () => {
+    const { swapPullup } = await import('../../src/domain/session');
+    const s = createSession('A', '2026-11-24', { ...base, hasPullupBar: true }, {});
+    const out = swapPullup(s, { ...base, hasPullupBar: false }, { 'band-bent-row': { level: 1, targetReps: 9, failStreak: 0 } });
+    expect(out.exercises[0]).toEqual({ exerciseId: 'band-bent-row', level: 1, levelLabel: 'Bantlı eğilerek row (Kırmızı)', targetReps: 9, sets: [null, null, null] });
+    expect(out.exercises.slice(1)).toEqual(s.exercises.slice(1));
+  });
+
+  test('bar var seçilince bantlı row barfikse döner', async () => {
+    const { swapPullup } = await import('../../src/domain/session');
+    const s = createSession('A', '2026-11-24', { ...base, hasPullupBar: false }, {});
+    expect(swapPullup(s, { ...base, hasPullupBar: true }, {}).exercises[0].exerciseId).toBe('pullup');
+  });
+
+  test('set girilmiş hareket değişmez (girilen setler kaybolmaz)', async () => {
+    const { swapPullup, setRep } = await import('../../src/domain/session');
+    const s = setRep(createSession('A', '2026-11-24', { ...base, hasPullupBar: true }, { pullup: { level: 1, targetReps: 4, failStreak: 0 } }), 'pullup', 0, 4);
+    expect(swapPullup(s, { ...base, hasPullupBar: false }, {})).toEqual(s);
+  });
+
+  test('seyahat oturumu değişmez', async () => {
+    const { swapPullup } = await import('../../src/domain/session');
+    const s = createSession('A', '2026-11-24', { ...base, hasPullupBar: false }, {}, 'travel');
+    expect(swapPullup(s, { ...base, hasPullupBar: true }, {})).toEqual(s);
+  });
+});
