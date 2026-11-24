@@ -85,7 +85,7 @@ test('ölçüm listeden silinebilir', async () => {
   const row = within(list).getByText('785 kg').closest('li')!;
   await user.click(within(row).getByRole('button', { name: 'Sil' }));
   await vi.waitFor(async () => expect(await repo.listMeasurements()).toHaveLength(1));
-  expect(screen.queryByText('785 kg')).not.toBeInTheDocument();
+  await vi.waitFor(() => expect(screen.queryByText('785 kg')).not.toBeInTheDocument());
 });
 
 test('ölçüm listeden düzeltilebilir', async () => {
