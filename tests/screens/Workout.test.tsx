@@ -7,6 +7,7 @@ import type { Settings, Session } from '../../src/domain/types';
 const settings: Settings = {
   ...structuredClone(repo.DEFAULT_SETTINGS),
   setupDone: true,
+  hasPullupBar: true,
   equipment: { bands: [{ id: 'b1', name: 'Sarı' }, { id: 'b2', name: 'Kırmızı' }], ladderRungs: 10 },
 };
 
@@ -241,4 +242,43 @@ test('seviye geri düşülen bitişte "Aynı hedeflerle devam" yazmaz', async ()
   const hero = screen.getByRole('heading', { name: 'Bugün çalıştırdığın kaslar' }).closest('section')!;
   expect(within(hero).getByText('3 set')).toBeInTheDocument();
   expect(screen.queryByText(/Aynı hedeflerle devam/)).not.toBeInTheDocument();
+});
+
+describe('seyahat modu ve barsız program', () => {
+  test('Seyahatte başla, yedek hareketlerle seyahat oturumu açar', async () => {
+    const user = userEvent.setup();
+    render(<Workout settings={settings} />);
+    await user.click(await screen.findByRole('button', { name: 'Seyahatte başla' }));
+    expect(await screen.findByRole('heading', { name: 'Antrenman A · Seyahat' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Bantlı eğilerek row' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Yerde bacak kaldırma' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Barfiks' })).not.toBeInTheDocument();
+    expect((await repo.getActiveSession())?.mode).toBe('travel');
+  });
+
+  test('bar yokken evde de barfiks yerine bantlı eğilerek row gelir', async () => {
+    const user = userEvent.setup();
+    const noBar = { ...settings, hasPullupBar: false };
+    render(<Workout settings={noBar} />);
+    const aDay = (await screen.findByText('A günü')).closest('section')!;
+    expect(within(aDay).getByText('Bantlı eğilerek row')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Başla' }));
+    expect(await screen.findByRole('heading', { name: 'Antrenman A' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Bantlı eğilerek row' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Şınav' })).toBeInTheDocument();
+  });
+
+  test('autoStart="travel" seyahat oturumunu doğrudan başlatır', async () => {
+    render(<Workout settings={settings} autoStart="travel" />);
+    expect(await screen.findByRole('heading', { name: 'Antrenman A · Seyahat' })).toBeInTheDocument();
+  });
+
+  test('seyahat oturumunun kas haritası gerçek hareketlerden çizilir', async () => {
+    const user = userEvent.setup();
+    render(<Workout settings={settings} />);
+    await user.click(await screen.findByRole('button', { name: 'Seyahatte başla' }));
+    const hero = (await screen.findByRole('heading', { name: 'Bugün çalışacak kasların 🔥' })).closest('section')!;
+    // Bantlı eğilerek row'un ana kası üst sırt; ev A gününde üst sırt ana değildir.
+    expect(within(within(hero).getByRole('list', { name: 'Çalışan kaslar' })).getByText('Üst sırt')).toBeInTheDocument();
+  });
 });

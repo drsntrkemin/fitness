@@ -4,6 +4,7 @@ import type { Settings } from '../../src/domain/types';
 const settings: Settings = {
   targets: { kcal: 2200, protein: 160, carbs: 220, fat: 70 },
   daysPerWeek: 3,
+  hasPullupBar: true,
   equipment: { bands: [{ id: 'b1', name: 'Sarı' }, { id: 'b2', name: 'Kırmızı' }], ladderRungs: 10 },
   overrides: {}, lastBackup: null, setupDone: true,
 };

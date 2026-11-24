@@ -27,7 +27,7 @@ describe('katalog', () => {
   });
 
   test('barfiks 4–8, yardımcı hareketler 10–15, diğerleri 8–12 tekrar aralığında', () => {
-    const accessory = ['band-lateral-raise', 'band-curl', 'band-fly', 'band-pushdown'];
+    const accessory = ['band-lateral-raise', 'band-curl', 'band-fly', 'band-pushdown', 'band-fly-back', 'band-overhead-triceps'];
     for (const e of EXERCISES) {
       const expected = e.id === 'pullup' ? [4, 8] : accessory.includes(e.id) ? [10, 15] : [8, 12];
       expect([e.repMin, e.repMax]).toEqual(expected);
@@ -99,7 +99,7 @@ describe('buildLadder', () => {
   test('squat en ağır banttan sonra tek bacak varyasyonlarıyla devam eder', () => {
     expect(buildLadder(ex('band-squat'), eq)).toEqual([
       'Bantlı squat (Sarı)', 'Bantlı squat (Kırmızı)', 'Bantlı squat (Siyah)',
-      'Bulgar split squat (her bacak)', 'Merdivene tutunarak tek bacak squat (her bacak)',
+      'Bulgar split squat (her bacak)', 'Tek bacak squat (bir yere tutunarak, her bacak)',
     ]);
   });
 

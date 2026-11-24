@@ -196,7 +196,7 @@ olarak yapılır; tekrar aralığı 10–15, haftada 2 günde de 3 set (karın h
 
 Bantlar zamanla bacak ve omuz press için hafif kalacağı için iki merdiven **sonuna** aşama eklenir (sona
 eklendiği için mevcut seviyeler kaymaz):
-- Bantlı squat → … en ağır bant → Bulgar split squat (arka ayak merdivende, her bacak) → Merdivene tutunarak tek bacak squat (her bacak)
+- Bantlı squat → … en ağır bant → Bulgar split squat (arka ayak merdivende, her bacak) → Tek bacak squat (bir yere tutunarak, her bacak)
 - Bantlı omuz press → … en ağır bant → Pike şınav (ayaklar yerde) → Pike şınav – ayaklar 1.–3. kademede (güvenlik için en fazla 3. kademe)
 
 Yeni sürüm indiğinde ana ekran uygulaması kendini bir kez yeniler (her set dokunuşta kaydedildiği için güvenli).

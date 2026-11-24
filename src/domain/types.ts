@@ -49,7 +49,11 @@ export interface ExerciseDef {
   stages: Stage[];
   howTo: string;
   muscles: MuscleSet;
+  /** Yedek hareket: A/B listelerinde görünmez, bir ana hareketin yerine geçer (bkz. program.ts SUBSTITUTES). */
+  substitute?: boolean;
 }
+
+export type WorkoutMode = 'home' | 'travel';
 
 export interface ExerciseOverride {
   repMin?: number;
@@ -88,6 +92,8 @@ export interface Settings {
   /** Günlük beslenme hedefleri; kurulumda atlanırsa null. */
   targets: Targets | null;
   daysPerWeek: 2 | 3;
+  /** Barfiks barı kurulu mu? Değilse barfiksin yerine bantlı eğilerek row gelir. */
+  hasPullupBar: boolean;
   equipment: Equipment;
   /** hareketId → kullanıcının set/tekrar aralığı ayarı. */
   overrides: Record<string, ExerciseOverride>;
@@ -110,6 +116,8 @@ export interface Session {
   date: DateKey;
   day: DayKey;
   status: 'active' | 'done';
+  /** Eski oturumlarda yok = evde. */
+  mode?: WorkoutMode;
   exercises: SessionExercise[];
 }
 

@@ -15,7 +15,7 @@ const settings: Settings = {
 const done = (date: string, day: 'A' | 'B' = 'A'): Session => ({ date, day, status: 'done', exercises: [] });
 
 function renderToday(s: Settings = settings) {
-  const props = { onOpenSettings: vi.fn(), onStartWorkout: vi.fn(), onContinueWorkout: vi.fn() };
+  const props = { onOpenSettings: vi.fn(), onStartWorkout: vi.fn(), onStartTravelWorkout: vi.fn(), onContinueWorkout: vi.fn() };
   render(<Today settings={s} {...props} />);
   return props;
 }

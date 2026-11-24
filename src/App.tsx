@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import TabBar, { type Tab } from './components/TabBar';
 import { getSettings } from './data/repo';
-import type { Settings } from './domain/types';
+import type { Settings, WorkoutMode } from './domain/types';
 import { requestPersist } from './platform/ios';
 import Nutrition from './screens/Nutrition';
 import Progress from './screens/Progress';
@@ -13,7 +13,7 @@ import Workout from './screens/Workout';
 export default function App() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [tab, setTab] = useState<Tab>('today');
-  const [autoStart, setAutoStart] = useState(false);
+  const [autoStart, setAutoStart] = useState<false | WorkoutMode>(false);
   const [showSettings, setShowSettings] = useState(false);
 
   const reload = useCallback(async () => {
@@ -27,7 +27,7 @@ export default function App() {
     requestPersist();
   }, [reload]);
 
-  const go = (t: Tab, start = false) => {
+  const go = (t: Tab, start: false | WorkoutMode = false) => {
     setAutoStart(start);
     setTab(t);
     window.scrollTo?.(0, 0);
@@ -41,7 +41,8 @@ export default function App() {
     <div className="app">
       {tab === 'today' && (
         <Today settings={settings} onOpenSettings={() => setShowSettings(true)}
-          onStartWorkout={() => go('workout', true)} onContinueWorkout={() => go('workout')} />
+          onStartWorkout={() => go('workout', 'home')} onStartTravelWorkout={() => go('workout', 'travel')}
+          onContinueWorkout={() => go('workout')} />
       )}
       {tab === 'workout' && <Workout settings={settings} autoStart={autoStart} />}
       {tab === 'nutrition' && <Nutrition settings={settings} />}

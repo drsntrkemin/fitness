@@ -37,6 +37,11 @@ Her hareketin bir tekrar aralığı var. Barfikste bu 4–8, günün sonundaki y
 - Aynı seviyede üst üste 2 antrenmanda alt sınırın altında kalırsan bir seviye geri inersin.
 - Squat ve omuz press'te en ağır bant da kolaylaşınca koç tek bacak squat ve pike şınav gibi merdiven varyasyonlarına geçer.
 
+### Barfiks barı yoksa ve seyahatte
+
+- **Barfiks barı:** Ayarlar (⚙) → Program → **Barfiks barım var**. Kapalıyken (varsayılan) barfiksin yerine **bantlı eğilerek row** yapılır. Barı kurunca aç; barfiks kaldığı seviyeden devam eder.
+- **Seyahat modu:** Sıradaki antrenman kartında **🧳 Seyahatte başla**. Yalnız bantlarla, yukarıdan bağlantı olmadan yapılır: ters row → bantlı oturarak row, şınav → dizüstü/yer/bantlı şınav, asılı bacak kaldırma → yerde bacak kaldırma, Pallof press → ölü böcek, göğüs fly → bantlı fly (bant sırttan), triceps pushdown → bantlı baş üstü triceps. Diğer bantlı hareketler aynen kalır. Seyahat hareketlerinin seviyeleri ayrı tutulur; A/B sırası iki modda ortaktır.
+
 ## Yedekleme
 
 Veriler sadece bu telefonda saklanır. Telefon kaybolursa ya da Safari verileri silinirse kayıtlar da gider.

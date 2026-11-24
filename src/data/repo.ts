@@ -6,6 +6,7 @@ import type { DateKey, DayKey, ExerciseState, Meal, Measurement, Session, Settin
 export const DEFAULT_SETTINGS: Settings = Object.freeze({
   targets: null,
   daysPerWeek: 3,
+  hasPullupBar: false,
   equipment: { bands: [], ladderRungs: 10 },
   overrides: {},
   lastBackup: null,

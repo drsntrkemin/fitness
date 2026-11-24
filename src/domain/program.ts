@@ -1,5 +1,5 @@
 import { EXERCISES } from './catalog';
-import type { DayKey, Equipment, ExerciseDef, ExerciseOverride } from './types';
+import type { DayKey, Equipment, ExerciseDef, ExerciseOverride, WorkoutMode } from './types';
 
 const range = (from: number, to: number) => {
   const out: number[] = [];
@@ -48,8 +48,29 @@ export function repRange(ex: ExerciseDef, override?: ExerciseOverride): { repMin
   return { repMin: override?.repMin ?? ex.repMin, repMax: override?.repMax ?? ex.repMax };
 }
 
+/** Günün ana hareketleri (yedekler hariç). */
 export function exercisesFor(day: DayKey): ExerciseDef[] {
-  return EXERCISES.filter((e) => e.day === day);
+  return EXERCISES.filter((e) => e.day === day && !e.substitute);
+}
+
+/** Seyahatte (yalnız bantlar, yukarı bağlantı yok) ana hareket → yedek. */
+export const TRAVEL_SUBSTITUTES: Record<string, string> = {
+  pullup: 'band-bent-row',
+  'inverted-row': 'band-seated-row',
+  pushup: 'travel-pushup',
+  'hanging-raise': 'floor-leg-raise',
+  'band-pallof': 'dead-bug',
+  'band-fly': 'band-fly-back',
+  'band-pushdown': 'band-overhead-triceps',
+};
+
+/** O gün gerçekten yapılacak hareketler: moda ve barfiks barına göre yedekler yerleşir. */
+export function planExercises(day: DayKey, opts: { mode: WorkoutMode; hasPullupBar: boolean }): ExerciseDef[] {
+  return exercisesFor(day).map((ex) => {
+    const subId = opts.mode === 'travel' ? TRAVEL_SUBSTITUTES[ex.id]
+      : ex.id === 'pullup' && !opts.hasPullupBar ? 'band-bent-row' : undefined;
+    return (subId && EXERCISES.find((e) => e.id === subId)) || ex;
+  });
 }
 
 export function nextDay(lastFinished: DayKey | null): DayKey {

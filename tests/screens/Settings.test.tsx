@@ -184,3 +184,12 @@ test('kademe sayısı yazarken değil, Kaydet ile değişir', async () => {
   // 12 kademede "6. kademe" 6. sırada (12,11,10,9,8,7,6)
   expect((await repo.getExerciseStates()).pushup.level).toBe(6);
 });
+
+test('"Barfiks barım var" anahtarı kaydedilir', async () => {
+  const user = userEvent.setup();
+  renderSettings();
+  const toggle = screen.getByRole('checkbox', { name: 'Barfiks barım var' });
+  expect(toggle).not.toBeChecked();
+  await user.click(toggle);
+  await vi.waitFor(async () => expect((await repo.getSettings()).hasPullupBar).toBe(true));
+});

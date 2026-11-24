@@ -47,7 +47,7 @@ test('Beslenmede geçmiş bir güne bakılıyorsa gün değişince o gün korunu
 });
 
 test('Bugün ekranı uyanınca yeni günün tarihini gösterir', async () => {
-  render(<Today settings={settings} onOpenSettings={() => {}} onStartWorkout={() => {}} onContinueWorkout={() => {}} />);
+  render(<Today settings={settings} onOpenSettings={() => {}} onStartWorkout={() => {}} onStartTravelWorkout={() => {}} onContinueWorkout={() => {}} />);
   await screen.findByRole('heading', { name: '23 Kasım Pazartesi' });
   vi.setSystemTime(new Date(2026, 10, 24, 8, 0));
   wakeUp();
@@ -56,7 +56,7 @@ test('Bugün ekranı uyanınca yeni günün tarihini gösterir', async () => {
 
 test('ölçüm kartı kaydedildiği andaki günü kullanır', async () => {
   const user = userEvent.setup();
-  render(<Today settings={settings} onOpenSettings={() => {}} onStartWorkout={() => {}} onContinueWorkout={() => {}} />);
+  render(<Today settings={settings} onOpenSettings={() => {}} onStartWorkout={() => {}} onStartTravelWorkout={() => {}} onContinueWorkout={() => {}} />);
   await screen.findByRole('heading', { name: 'Haftalık ölçüm' });
   vi.setSystemTime(new Date(2026, 10, 24, 0, 10));
   await user.type(screen.getByLabelText('Kilo (kg)'), '78,4');

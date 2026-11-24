@@ -6,9 +6,10 @@ import ProgressBar from '../components/ProgressBar';
 import * as repo from '../data/repo';
 import { daysBetween, formatDay, localDateKey, weekStart } from '../domain/dates';
 import { dayTotals } from '../domain/nutrition';
-import { exercisesFor, nextDay } from '../domain/program';
+import { nextDay, planExercises } from '../domain/program';
+import { planMuscles, plannedSessionMuscles } from '../domain/muscles';
 import { buildClaudeSummary } from '../domain/summary';
-import type { DayKey, Macros, Settings } from '../domain/types';
+import type { DayKey, Macros, Session, Settings } from '../domain/types';
 import { copyText, isStandalone } from '../platform/ios';
 import { useToday } from '../hooks/useToday';
 
@@ -16,12 +17,13 @@ interface Props {
   settings: Settings;
   onOpenSettings: () => void;
   onStartWorkout: () => void;
+  onStartTravelWorkout: () => void;
   onContinueWorkout: () => void;
 }
 
 interface Data {
-  /** Açık antrenmanın günü; yoksa null. */
-  activeDay: DayKey | null;
+  /** Açık antrenman; yoksa null. */
+  active: Session | null;
   next: DayKey;
   weekCount: number;
   totals: Macros;
@@ -33,7 +35,7 @@ interface Data {
 const HINT_KEY = 'ev-fitness:install-hint-dismissed';
 const readHintDismissed = () => { try { return localStorage.getItem(HINT_KEY) === '1'; } catch { return false; } };
 
-export default function Today({ settings, onOpenSettings, onStartWorkout, onContinueWorkout }: Props) {
+export default function Today({ settings, onOpenSettings, onStartWorkout, onStartTravelWorkout, onContinueWorkout }: Props) {
   const today = useToday();
   const [data, setData] = useState<Data | null>(null);
   const [adding, setAdding] = useState(false);
@@ -47,7 +49,7 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onCont
     ]);
     const lastM = measurements.at(-1);
     setData({
-      activeDay: active?.day ?? null,
+      active: active ?? null,
       next: nextDay(last),
       weekCount: sessions.filter((s) => s.date >= weekStart(today)).length,
       totals: dayTotals(meals.filter((m) => m.date === today)),
@@ -63,6 +65,7 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onCont
   if (!data) return <main className="screen" aria-busy="true" />;
 
   const tg = settings.targets;
+  const homePlan = { mode: 'home' as const, hasPullupBar: settings.hasPullupBar };
   const backupDue = settings.lastBackup === null ? data.hasAnyRecord : daysBetween(settings.lastBackup, today) >= 30;
 
   const ask = async () => {
@@ -89,14 +92,17 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onCont
         <button type="button" className="icon-btn" aria-label="Ayarlar" onClick={onOpenSettings}>⚙</button>
       </header>
 
-      {data.activeDay ? (
-        <NextWorkoutCard day={data.activeDay} title="Antrenman devam ediyor" subtitle={`Antrenman ${data.activeDay}`}
+      {data.active ? (
+        <NextWorkoutCard muscles={activeMuscles(data.active, settings.hasPullupBar)} title="Antrenman devam ediyor"
+          subtitle={`Antrenman ${data.active.day}${data.active.mode === 'travel' ? ' · Seyahat' : ''}`}
           actionLabel="Devam et" onAction={onContinueWorkout}>
           <p className="small week-count">{`Bu hafta ${data.weekCount} / ${settings.daysPerWeek} antrenman`}</p>
         </NextWorkoutCard>
       ) : (
-        <NextWorkoutCard day={data.next} title={`Sıradaki: Antrenman ${data.next} (${exercisesFor(data.next).length} hareket)`}
-          actionLabel="Başla" onAction={onStartWorkout}>
+        <NextWorkoutCard muscles={planMuscles(data.next, homePlan)}
+          title={`Sıradaki: Antrenman ${data.next} (${planExercises(data.next, homePlan).length} hareket)`}
+          actionLabel="Başla" onAction={onStartWorkout}
+          secondary={{ label: 'Seyahatte başla', onAction: onStartTravelWorkout }}>
           <p className="small week-count">{`Bu hafta ${data.weekCount} / ${settings.daysPerWeek} antrenman`}</p>
         </NextWorkoutCard>
       )}
@@ -157,4 +163,10 @@ function MeasurementCard({ onSaved }: { onSaved: () => void }) {
       }} />
     </section>
   );
+}
+
+/** Açık antrenmanın kasları; oturumdan çıkarılamazsa (hareketsiz eski kayıt) o günün planı. */
+function activeMuscles(s: Session, hasPullupBar: boolean) {
+  const m = plannedSessionMuscles(s);
+  return m.primary.length ? m : planMuscles(s.day, { mode: s.mode ?? 'home', hasPullupBar });
 }

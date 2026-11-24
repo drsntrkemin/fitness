@@ -1,7 +1,7 @@
 import { EXERCISES } from './catalog';
-import { buildLadder, clampLevel, exercisesFor, repRange, setsFor } from './program';
+import { buildLadder, clampLevel, planExercises, repRange, setsFor } from './program';
 import { progress } from './progression';
-import type { DateKey, DayKey, ExerciseDef, ExerciseState, ProgressEvent, Session, SessionExercise, Settings } from './types';
+import type { DateKey, DayKey, ExerciseDef, ExerciseState, ProgressEvent, Session, SessionExercise, Settings, WorkoutMode } from './types';
 
 export interface FinishResult {
   exerciseId: string;
@@ -16,8 +16,11 @@ const defOf = (id: string): ExerciseDef => {
 };
 
 /** Sıradaki günün oturumunu kayıtlı durumlara göre kurar. Durumu olmayan harekette level = -1. */
-export function createSession(day: DayKey, date: DateKey, settings: Settings, states: Record<string, ExerciseState>): Session {
-  const exercises: SessionExercise[] = exercisesFor(day).map((ex) => {
+export function createSession(
+  day: DayKey, date: DateKey, settings: Settings, states: Record<string, ExerciseState>, mode: WorkoutMode = 'home',
+): Session {
+  const plan = planExercises(day, { mode, hasPullupBar: settings.hasPullupBar });
+  const exercises: SessionExercise[] = plan.map((ex) => {
     const ladder = buildLadder(ex, settings.equipment);
     const { repMin, repMax } = repRange(ex, settings.overrides[ex.id]);
     const sets = Array<number | null>(setsFor(ex, settings.daysPerWeek, settings.overrides[ex.id])).fill(null);
@@ -27,7 +30,7 @@ export function createSession(day: DayKey, date: DateKey, settings: Settings, st
     const targetReps = Math.max(repMin, Math.min(st.targetReps, repMax));
     return { exerciseId: ex.id, level, levelLabel: ladder[level], targetReps, sets };
   });
-  return { date, day, status: 'active', exercises };
+  return { date, day, status: 'active', mode, exercises };
 }
 
 const mapExercise = (s: Session, id: string, fn: (e: SessionExercise) => SessionExercise): Session => ({

@@ -41,3 +41,12 @@ test('Bugün ekranındaki ⚙ ayarları açar, Kapat geri döner', async () => {
   await user.click(screen.getByRole('button', { name: 'Kapat' }));
   expect(await screen.findByRole('navigation')).toBeInTheDocument();
 });
+
+test('Bugün ekranındaki "Seyahatte başla" seyahat antrenmanını açar', async () => {
+  const { default: userEvent } = await import('@testing-library/user-event');
+  const user = userEvent.setup();
+  await repo.saveSettings({ ...repo.DEFAULT_SETTINGS, setupDone: true });
+  render(<App />);
+  await user.click(await screen.findByRole('button', { name: 'Seyahatte başla' }));
+  expect(await screen.findByRole('heading', { name: 'Antrenman A · Seyahat' })).toBeInTheDocument();
+});

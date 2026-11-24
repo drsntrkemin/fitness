@@ -168,6 +168,12 @@ export default function SettingsScreen({ settings, onChange, onClose }: Props) {
             ))}
           </div>
           <p className="muted small">Haftada 2 günde ana hareketler 4 set olur.</p>
+          <label className="toggle-row">
+            <input type="checkbox" checked={s.hasPullupBar}
+              onChange={(e) => persist({ ...s, hasPullupBar: e.target.checked })} />
+            <span>Barfiks barım var</span>
+          </label>
+          <p className="muted small">Kapalıyken barfiksin yerine bantlı eğilerek row yapılır. Barı kurunca aç; barfiks kaldığı seviyeden devam eder.</p>
         </section>
 
         <section className="card">

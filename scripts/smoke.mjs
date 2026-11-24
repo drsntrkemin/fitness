@@ -44,15 +44,16 @@ await page.getByRole('button', { name: 'Bitir' }).click();
 check(await visible(page.getByText('Sıradaki: Antrenman A (7 hareket)')), 'kurulum sonrası Bugün ekranı açıldı');
 
 // 2) Antrenman
-await page.getByRole('button', { name: 'Başla' }).click();
+await page.getByRole('button', { name: 'Başla', exact: true }).click();
 await page.getByRole('heading', { name: 'Antrenman A' }).waitFor();
-await page.getByRole('button', { name: 'Bant destekli (Kırmızı)' }).click();
-for (const i of [1, 2, 3]) await page.getByRole('button', { name: `Barfiks set ${i}` }).click();
+// Varsayılan: barfiks barı yok → barfiksin yerine bantlı eğilerek row.
+await page.getByRole('button', { name: 'Bantlı eğilerek row (Kırmızı)' }).click();
+for (const i of [1, 2, 3]) await page.getByRole('button', { name: `Bantlı eğilerek row set ${i}` }).click();
 await page.getByLabel('Başlangıç seviyeni seç').first().selectOption({ label: 'Eğimli şınav – 6. kademe' });
 for (const i of [1, 2, 3]) await page.getByRole('button', { name: `Şınav set ${i}` }).click();
 await page.getByRole('button', { name: 'Bitir' }).click();
 await page.getByRole('heading', { name: /Antrenman bitti/ }).waitFor();
-check(await visible(page.getByText('Sonraki sefer: 3×5')), 'barfiks hedefi 4 → 5 tekrara çıktı');
+check(await visible(page.locator('.result-row', { hasText: 'Bantlı eğilerek row' }).getByText('Sonraki sefer: 3×9')), 'bantlı row hedefi 8 → 9 tekrara çıktı');
 await page.getByRole('button', { name: 'Tamam' }).click();
 
 // 3) Öğün
@@ -70,8 +71,8 @@ await page.getByText('Sıradaki: Antrenman B (7 hareket)').waitFor();
 check(await visible(page.getByText('420 / 2200 kcal')), 'yenilemeden sonra öğün duruyor');
 check(await visible(page.getByText('22,5 / 160 g')), 'yenilemeden sonra protein (virgüllü) duruyor');
 await tab('İlerleme');
-await page.getByRole('button', { name: 'Barfiks' }).click();
-check(await visible(page.getByRole('list', { name: 'Barfiks geçmişi' }).getByText('4, 4, 4')), 'barfiks geçmişi kayıtlı');
+await page.getByRole('button', { name: 'Bantlı eğilerek row' }).click();
+check(await visible(page.getByRole('list', { name: 'Bantlı eğilerek row geçmişi' }).getByText('8, 8, 8')), 'bantlı row geçmişi kayıtlı');
 
 // 5) Ekran görüntüleri: dört sekme × açık/koyu
 for (const scheme of ['light', 'dark']) {

@@ -6,15 +6,15 @@ import { SetBox, SetStepper } from '../components/SetInput';
 import * as repo from '../data/repo';
 import { EXERCISES } from '../domain/catalog';
 import { formatDay, localDateKey } from '../domain/dates';
-import { dayMuscles, finishStats, sessionMuscles } from '../domain/muscles';
-import { buildLadder, clampLevel, exercisesFor, nextDay, repRange, setsFor } from '../domain/program';
+import { finishStats, planMuscles, plannedSessionMuscles, sessionMuscles } from '../domain/muscles';
+import { buildLadder, clampLevel, nextDay, planExercises, repRange, setsFor } from '../domain/program';
 import { chooseLevel, createSession, finishSession, hasAnySet, setRep, type FinishResult } from '../domain/session';
-import type { DayKey, ExerciseState, Session, SessionExercise, Settings } from '../domain/types';
+import type { DayKey, ExerciseState, Session, SessionExercise, Settings, WorkoutMode } from '../domain/types';
 
 interface Props {
   settings: Settings;
-  /** Bugün ekranındaki "Başla"dan gelindiyse oturumu hemen başlat. */
-  autoStart?: boolean;
+  /** Bugün ekranındaki "Başla"dan gelindiyse oturumu hemen başlat (true = evde). */
+  autoStart?: boolean | WorkoutMode;
   /** Oturum başladı/bitti/silindi; üst bileşen gerekirse yenilenir. */
   onSessionChange?: () => void;
 }
@@ -54,9 +54,9 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
     setView({ kind: 'active' });
   };
 
-  const start = useCallback(() => guard(async () => {
+  const start = useCallback((mode: WorkoutMode = 'home') => guard(async () => {
     const data = await loadIdle();
-    const s = await repo.startSession(() => createSession(data.next, localDateKey(new Date()), settings, data.states));
+    const s = await repo.startSession(() => createSession(data.next, localDateKey(new Date()), settings, data.states, mode));
     showSession(s);
     onSessionChange?.();
   }), [loadIdle, settings, onSessionChange]);
@@ -69,7 +69,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
       if (activeSession) return showSession(activeSession);
       if (autoStart && !started.current) {
         started.current = true;
-        return start();
+        return start(autoStart === 'travel' ? 'travel' : 'home');
       }
       setView({ kind: 'idle', data: await loadIdle() });
     })();
@@ -143,14 +143,14 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
     return (
       <main className="screen">
         <header className="screen-header">
-          <h1>Antrenman {session.day}</h1>
+          <h1>{`Antrenman ${session.day}${session.mode === 'travel' ? ' · Seyahat' : ''}`}</h1>
           <button type="button" className="btn btn-primary" disabled={busy || !hasAnySet(session)} onClick={finish}>Bitir</button>
         </header>
         <section className="card hero">
           <h2>Bugün çalışacak kasların 🔥</h2>
           <p className="hero-sub">{`${session.exercises.length} hareket · tüm vücut`}</p>
-          <BodyMap muscles={dayMuscles(session.day)} size={190} tone="onDark" />
-          <MuscleChips muscles={dayMuscles(session.day)} showSecondary={false} />
+          <BodyMap muscles={plannedSessionMuscles(session)} size={190} tone="onDark" />
+          <MuscleChips muscles={plannedSessionMuscles(session)} showSecondary={false} />
         </section>
         {session.exercises.map((e) => (
           <ExerciseCard key={e.exerciseId} entry={e} settings={settings}
@@ -166,17 +166,19 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
 
   const data = view.kind === 'idle' ? view.data : null;
   if (!data) return null;
+  const homePlan = { mode: 'home' as const, hasPullupBar: settings.hasPullupBar };
   return (
     <main className="screen">
       <header className="screen-header"><h1>Antrenman</h1></header>
-      <NextWorkoutCard day={data.next} title={`Sıradaki: Antrenman ${data.next}`}
-        subtitle={`${exercisesFor(data.next).length} hareket · yaklaşık 50–55 dakika`}
-        actionLabel="Başla" onAction={start} disabled={busy} />
+      <NextWorkoutCard muscles={planMuscles(data.next, homePlan)} title={`Sıradaki: Antrenman ${data.next}`}
+        subtitle={`${planExercises(data.next, homePlan).length} hareket · yaklaşık 50–55 dakika`}
+        actionLabel="Başla" onAction={() => start('home')}
+        secondary={{ label: 'Seyahatte başla', onAction: () => start('travel') }} disabled={busy} />
       {(['A', 'B'] as const).map((day) => (
         <section key={day} className="card">
           <h3 className="group-title">{day} günü</h3>
           <ul className="list">
-            {exercisesFor(day).map((ex) => {
+            {planExercises(day, homePlan).map((ex) => {
               const st = data.states[ex.id];
               const ladder = buildLadder(ex, settings.equipment);
               const sets = setsFor(ex, settings.daysPerWeek, settings.overrides[ex.id]);

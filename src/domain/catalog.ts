@@ -32,9 +32,9 @@ export const EXERCISES: ExerciseDef[] = [
     stages: [
       { kind: 'bands', label: 'Bantlı squat ({band})' },
       { kind: 'fixed', label: 'Bulgar split squat (her bacak)' },
-      { kind: 'fixed', label: 'Merdivene tutunarak tek bacak squat (her bacak)' },
+      { kind: 'fixed', label: 'Tek bacak squat (bir yere tutunarak, her bacak)' },
     ],
-    howTo: 'Bandın ortasına omuz genişliğinde bas, uçlarını omuz hizasında tut. Kalçayı geriye iterek uyluklar yere paralel olana kadar çömel, topuklardan itip kalk. Bulgar split squatta arka ayağının üstünü merdivenin alt kademesine koy ve tek bacakla çömel; tek bacak squatta merdivene hafifçe tutunarak dengeni koru. Bu iki aşamada tekrarlar her bacak için sayılır.',
+    howTo: 'Bandın ortasına omuz genişliğinde bas, uçlarını omuz hizasında tut. Kalçayı geriye iterek uyluklar yere paralel olana kadar çömel, topuklardan itip kalk. Bulgar split squatta arka ayağının üstünü merdivenin alt kademesine (seyahatte sandalye ya da yatak kenarına) koy ve tek bacakla çömel; tek bacak squatta merdivene ya da duvara hafifçe tutunarak dengeni koru. Bu iki aşamada tekrarlar her bacak için sayılır.',
     muscles: { primary: ['quads', 'glutes'], secondary: ['hamstrings', 'lowerBack'] },
   },
   {
@@ -112,6 +112,59 @@ export const EXERCISES: ExerciseDef[] = [
     id: 'band-pushdown', name: 'Bantlı triceps pushdown', day: 'B', repMin: 10, repMax: 15, accessory: true,
     stages: [{ kind: 'bands', label: 'Bantlı triceps pushdown ({band})' }],
     howTo: 'Bandı merdivenin üst kademesine dola, merdivene dönük dur. Dirseklerini gövdene sabitle ve uçları aşağı, kolların tam düzleşene kadar it; yavaşça bırak.',
+    muscles: { primary: ['triceps'], secondary: [] },
+  },
+  // ── Yedekler: bar yokken ya da seyahatte (yalnız bantlar) ana hareketlerin yerine geçer ──
+  {
+    id: 'band-bent-row', name: 'Bantlı eğilerek row', day: 'A', repMin: 8, repMax: 12, substitute: true,
+    stages: [{ kind: 'bands', label: 'Bantlı eğilerek row ({band})' }],
+    howTo: 'Bandın ortasına omuz genişliğinde bas, dizler hafif bükük ve sırt düz şekilde kalçadan öne eğil. Uçları dirseklerin gövdene yakın kalacak şekilde kaburgalarına doğru çek, kürek kemiklerini sık, yavaşça bırak.',
+    muscles: { primary: ['lats', 'upperBack'], secondary: ['biceps', 'rearDelts'] },
+  },
+  {
+    id: 'travel-pushup', name: 'Şınav (seyahat)', day: 'A', repMin: 8, repMax: 12, substitute: true,
+    stages: [
+      { kind: 'fixed', label: 'Dizüstü şınav' },
+      { kind: 'fixed', label: 'Yer şınavı' },
+      { kind: 'bands', label: 'Bantlı şınav ({band})' },
+    ],
+    howTo: 'Eller omuz genişliğinde, vücut düz. Bantlı şınavda bandı sırtından geçirip uçlarını avuçlarınla yere bastır; bant itişi zorlaştırır.',
+    muscles: { primary: ['chest', 'triceps'], secondary: ['shoulders', 'abs'] },
+  },
+  {
+    id: 'floor-leg-raise', name: 'Yerde bacak kaldırma', day: 'A', repMin: 8, repMax: 12, core: true, substitute: true,
+    stages: [
+      { kind: 'fixed', label: 'Yerde diz çekme (reverse crunch)' },
+      { kind: 'fixed', label: 'Yerde düz bacak kaldırma' },
+    ],
+    howTo: 'Sırtüstü yat, ellerini kalçanın yanına koy, belini yere bastır. Dizlerini göğsüne çekip kalçanı hafifçe kaldır; ileri seviyede bacakları düz tutarak dik konuma kaldır. Yavaşça indir.',
+    muscles: { primary: ['abs'], secondary: ['obliques'] },
+  },
+  {
+    id: 'band-seated-row', name: 'Bantlı oturarak row', day: 'B', repMin: 8, repMax: 12, substitute: true,
+    stages: [{ kind: 'bands', label: 'Bantlı oturarak row ({band})' }],
+    howTo: 'Yerde bacakların düz otur, bandı ayak tabanlarından dolayıp uçlarını tut. Dik otur, dirsekleri geriye çekip kürek kemiklerini sık, yavaşça bırak.',
+    muscles: { primary: ['upperBack', 'lats'], secondary: ['biceps', 'rearDelts'] },
+  },
+  {
+    id: 'dead-bug', name: 'Ölü böcek', day: 'B', repMin: 8, repMax: 12, perSide: true, core: true, substitute: true,
+    stages: [
+      { kind: 'fixed', label: 'Ölü böcek' },
+      { kind: 'fixed', label: 'Yavaş tempolu ölü böcek (3 sn)' },
+    ],
+    howTo: 'Sırtüstü yat, kollar tavana, dizler 90° havada. Belini yere bastırırken karşı kol ve bacağı yere doğru uzat, geri getir, taraf değiştir. Belin yerden kalkmamalı. Tekrarlar her taraf için sayılır.',
+    muscles: { primary: ['obliques', 'abs'], secondary: [] },
+  },
+  {
+    id: 'band-fly-back', name: 'Bantlı fly (bant sırttan)', day: 'B', repMin: 10, repMax: 15, accessory: true, substitute: true,
+    stages: [{ kind: 'bands', label: 'Bantlı fly – sırttan ({band})' }],
+    howTo: 'Bandı sırtından, kürek kemiklerinin hizasından geçir ve uçlarını iki yanda tut. Dirsekler hafif bükük, kollarını önde birleştir ("sarılır gibi"), yavaşça aç.',
+    muscles: { primary: ['chest'], secondary: ['shoulders'] },
+  },
+  {
+    id: 'band-overhead-triceps', name: 'Bantlı baş üstü triceps', day: 'B', repMin: 10, repMax: 15, accessory: true, substitute: true,
+    stages: [{ kind: 'bands', label: 'Bantlı baş üstü triceps ({band})' }],
+    howTo: 'Bandın bir ucuna arka ayağınla bas, diğer ucunu iki elinle başının arkasında tut. Dirsekler kulak hizasında sabit, kollarını tam yukarı uzat, yavaşça indir.',
     muscles: { primary: ['triceps'], secondary: [] },
   },
 ];

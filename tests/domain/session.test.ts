@@ -5,6 +5,7 @@ import type { Settings, Session } from '../../src/domain/types';
 const settings: Settings = {
   ...structuredClone(DEFAULT_SETTINGS),
   setupDone: true,
+  hasPullupBar: true,
   equipment: { bands: [{ id: 'b1', name: 'Sarı' }, { id: 'b2', name: 'Kırmızı' }], ladderRungs: 10 },
 };
 const ex = (s: Session, id: string) => s.exercises.find((e) => e.exerciseId === id)!;

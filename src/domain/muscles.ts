@@ -1,6 +1,6 @@
 import { EXERCISES } from './catalog';
-import { exercisesFor } from './program';
-import type { DayKey, Muscle, MuscleSet, ProgressEvent, Session } from './types';
+import { exercisesFor, planExercises } from './program';
+import type { DayKey, Muscle, MuscleSet, ProgressEvent, Session, WorkoutMode } from './types';
 
 export const MUSCLE_NAMES: Record<Muscle, string> = {
   shoulders: 'Omuz', chest: 'Göğüs', biceps: 'Biceps', forearms: 'Ön kol', abs: 'Karın', obliques: 'Yan karın',
@@ -27,6 +27,19 @@ export function mergeMuscles(sets: MuscleSet[]): MuscleSet {
 
 export function dayMuscles(day: DayKey): MuscleSet {
   return mergeMuscles(exercisesFor(day).map((e) => e.muscles));
+}
+
+/** O gün gerçekten yapılacak hareketlerin kasları (mod ve barfiks barına göre). */
+export function planMuscles(day: DayKey, opts: { mode: WorkoutMode; hasPullupBar: boolean }): MuscleSet {
+  return mergeMuscles(planExercises(day, opts).map((e) => e.muscles));
+}
+
+/** Oturumdaki tüm hareketlerin kasları (set girilmiş olsun olmasın). */
+export function plannedSessionMuscles(s: Session): MuscleSet {
+  return mergeMuscles(s.exercises.flatMap((e) => {
+    const def = EXERCISES.find((x) => x.id === e.exerciseId);
+    return def ? [def.muscles] : [];
+  }));
 }
 
 /** Oturumda en az bir seti girilen (ve katalogda bulunan) hareketlerin kasları. */

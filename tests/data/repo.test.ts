@@ -13,7 +13,7 @@ describe('ayarlar', () => {
   test('boş veritabanında varsayılan ayarlar döner', async () => {
     expect(await repo.getSettings()).toEqual(repo.DEFAULT_SETTINGS);
     expect(repo.DEFAULT_SETTINGS).toEqual({
-      targets: null, daysPerWeek: 3, equipment: { bands: [], ladderRungs: 10 },
+      targets: null, daysPerWeek: 3, hasPullupBar: false, equipment: { bands: [], ladderRungs: 10 },
       overrides: {}, lastBackup: null, setupDone: false,
     });
   });
