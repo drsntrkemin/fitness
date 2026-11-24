@@ -90,18 +90,27 @@ describe('antrenman kartı', () => {
     expect(props.onContinueWorkout).toHaveBeenCalled();
   });
 
-  test('sıradaki antrenman kartında o günün kas figürü var', async () => {
+  test('sıradaki antrenman kartında kaslı dost var (ilk gün: seviye 1, tombul)', async () => {
     renderToday();
     const card = (await screen.findByText('Sıradaki: Antrenman A (7 hareket)')).closest('section')!;
-    expect(within(card).getByRole('img', { name: /^Ön: .*Göğüs/ })).toBeInTheDocument();
+    expect(within(card).getByRole('img', { name: 'Kaslı dostun, seviye 1, tombul' })).toBeInTheDocument();
+    expect(within(card).getByText('Sonraki seviyeye 3 antrenman')).toBeInTheDocument();
   });
 
-  test('antrenman devam ederken o oturumun gününün kasları gösterilir', async () => {
+  test('antrenman devam ederken de kaslı dost ve Devam et gösterilir', async () => {
     await repo.saveSession({ ...done(today, 'B'), status: 'active' });
     renderToday();
     const card = (await screen.findByText('Antrenman devam ediyor')).closest('section')!;
-    expect(within(card).getByRole('img', { name: /^Arka: .*Üst sırt/ })).toBeInTheDocument();
+    expect(within(card).getByRole('img', { name: /^Kaslı dostun, seviye 1/ })).toBeInTheDocument();
     expect(within(card).getByRole('button', { name: 'Devam et' })).toBeInTheDocument();
+  });
+
+  test('en üst seviyede kutlama yazısı', async () => {
+    for (let i = 0; i < 27; i++) await repo.saveSession(done(addDays(today, -30 - i)));
+    renderToday();
+    const card = (await screen.findByText(/^Sıradaki: Antrenman/)).closest('section')!;
+    expect(within(card).getByRole('img', { name: 'Kaslı dostun, seviye 10, kaslı' })).toBeInTheDocument();
+    expect(within(card).getByText('En üst seviye! 🏆')).toBeInTheDocument();
   });
 
   test('bu hafta tamamlanan antrenman sayısını hedefle gösterir', async () => {

@@ -1,6 +1,5 @@
 import { EXERCISES } from './catalog';
-import { exercisesFor, planExercises } from './program';
-import type { DayKey, Muscle, MuscleSet, ProgressEvent, Session, WorkoutMode } from './types';
+import type { Muscle, MuscleSet, ProgressEvent, Session } from './types';
 
 export const MUSCLE_NAMES: Record<Muscle, string> = {
   shoulders: 'Omuz', chest: 'Göğüs', biceps: 'Biceps', forearms: 'Ön kol', abs: 'Karın', obliques: 'Yan karın',
@@ -23,23 +22,6 @@ export function mergeMuscles(sets: MuscleSet[]): MuscleSet {
   for (const s of sets) for (const m of s.primary) if (!primary.includes(m)) primary.push(m);
   for (const s of sets) for (const m of s.secondary) if (!primary.includes(m) && !secondary.includes(m)) secondary.push(m);
   return { primary, secondary };
-}
-
-export function dayMuscles(day: DayKey): MuscleSet {
-  return mergeMuscles(exercisesFor(day).map((e) => e.muscles));
-}
-
-/** O gün gerçekten yapılacak hareketlerin kasları (mod ve barfiks barına göre). */
-export function planMuscles(day: DayKey, opts: { mode: WorkoutMode; hasPullupBar: boolean }): MuscleSet {
-  return mergeMuscles(planExercises(day, opts).map((e) => e.muscles));
-}
-
-/** Oturumdaki tüm hareketlerin kasları (set girilmiş olsun olmasın). */
-export function plannedSessionMuscles(s: Session): MuscleSet {
-  return mergeMuscles(s.exercises.flatMap((e) => {
-    const def = EXERCISES.find((x) => x.id === e.exerciseId);
-    return def ? [def.muscles] : [];
-  }));
 }
 
 /** Oturumda en az bir seti girilen (ve katalogda bulunan) hareketlerin kasları. */

@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import BodyMap from './BodyMap';
-import type { MuscleSet } from '../domain/types';
+import Buddy from './Buddy';
+import { buddyLevel } from '../domain/buddy';
 
 interface Props {
-  muscles: MuscleSet;
+  /** Tamamlanan antrenman sayısı: kaslı dostun seviyesini belirler. */
+  completed: number;
   title: string;
   subtitle?: string;
   actionLabel: string;
@@ -14,16 +15,24 @@ interface Props {
   children?: ReactNode;
 }
 
-/** Yeşil degrade "sıradaki antrenman" kartı: yazı solda, o günün kas figürü sağda. */
-export default function NextWorkoutCard({ muscles, title, subtitle, actionLabel, onAction, secondary, disabled, children }: Props) {
+/** Yeşil degrade "sıradaki antrenman" kartı: solda kaslı dost, sağda seviye ve ilerleme. */
+export default function NextWorkoutCard({ completed, title, subtitle, actionLabel, onAction, secondary, disabled, children }: Props) {
+  const b = buddyLevel(completed);
   return (
     <section className="card hero next-workout">
-      <div className="next-row">
-        <div className="grow">
-          <h2>{title}</h2>
-          {subtitle && <p className="hero-sub">{subtitle}</p>}
+      <h2>{title}</h2>
+      {subtitle && <p className="hero-sub">{subtitle}</p>}
+      <div className="buddy-row">
+        <Buddy level={b.level} size={104} />
+        <div className="grow buddy-info">
+          <p className="buddy-title">{`Kaslı dostun · Seviye ${b.level}`}</p>
+          <p className="hero-sub">{`${completed} antrenman tamamladın 💪`}</p>
+          <div className="buddy-bar" role="progressbar" aria-label="Sonraki seviye" aria-valuemin={0} aria-valuemax={100}
+            aria-valuenow={Math.round(b.progress * 100)}>
+            <div style={{ width: `${b.progress * 100}%` }} />
+          </div>
+          <p className="hero-sub">{b.toNext === null ? 'En üst seviye! 🏆' : `Sonraki seviyeye ${b.toNext} antrenman`}</p>
         </div>
-        <BodyMap muscles={muscles} size={90} tone="onDark" />
       </div>
       <button type="button" className="btn btn-hero btn-block" disabled={disabled} onClick={onAction}>{actionLabel}</button>
       {secondary && (

@@ -7,7 +7,6 @@ import * as repo from '../data/repo';
 import { daysBetween, formatDay, localDateKey, weekStart } from '../domain/dates';
 import { dayTotals } from '../domain/nutrition';
 import { nextDay, planExercises } from '../domain/program';
-import { planMuscles, plannedSessionMuscles } from '../domain/muscles';
 import { buildClaudeSummary } from '../domain/summary';
 import type { DayKey, Macros, Session, Settings } from '../domain/types';
 import { copyText, isStandalone } from '../platform/ios';
@@ -22,6 +21,8 @@ interface Props {
 }
 
 interface Data {
+  /** Tamamlanan antrenman sayısı (kaslı dostun seviyesi). */
+  completed: number;
   /** Açık antrenman; yoksa null. */
   active: Session | null;
   next: DayKey;
@@ -50,6 +51,7 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onStar
     const lastM = measurements.at(-1);
     setData({
       active: active ?? null,
+      completed: sessions.length,
       next: nextDay(last),
       weekCount: sessions.filter((s) => s.date >= weekStart(today)).length,
       totals: dayTotals(meals.filter((m) => m.date === today)),
@@ -93,13 +95,13 @@ export default function Today({ settings, onOpenSettings, onStartWorkout, onStar
       </header>
 
       {data.active ? (
-        <NextWorkoutCard muscles={activeMuscles(data.active, settings.hasPullupBar)} title="Antrenman devam ediyor"
+        <NextWorkoutCard completed={data.completed} title="Antrenman devam ediyor"
           subtitle={`Antrenman ${data.active.day}${data.active.mode === 'travel' ? ' · Seyahat' : ''}`}
           actionLabel="Devam et" onAction={onContinueWorkout}>
           <p className="small week-count">{`Bu hafta ${data.weekCount} / ${settings.daysPerWeek} antrenman`}</p>
         </NextWorkoutCard>
       ) : (
-        <NextWorkoutCard muscles={planMuscles(data.next, homePlan)}
+        <NextWorkoutCard completed={data.completed}
           title={`Sıradaki: Antrenman ${data.next} (${planExercises(data.next, homePlan).length} hareket)`}
           actionLabel="Başla" onAction={onStartWorkout}
           secondary={{ label: 'Seyahatte başla', onAction: onStartTravelWorkout }}>
@@ -165,8 +167,3 @@ function MeasurementCard({ onSaved }: { onSaved: () => void }) {
   );
 }
 
-/** Açık antrenmanın kasları; oturumdan çıkarılamazsa (hareketsiz eski kayıt) o günün planı. */
-function activeMuscles(s: Session, hasPullupBar: boolean) {
-  const m = plannedSessionMuscles(s);
-  return m.primary.length ? m : planMuscles(s.day, { mode: s.mode ?? 'home', hasPullupBar });
-}

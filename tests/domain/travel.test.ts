@@ -1,6 +1,5 @@
 import { EXERCISES } from '../../src/domain/catalog';
 import { exercisesFor, planExercises } from '../../src/domain/program';
-import { planMuscles } from '../../src/domain/muscles';
 import { createSession } from '../../src/domain/session';
 import { DEFAULT_SETTINGS } from '../../src/data/repo';
 import type { Settings } from '../../src/domain/types';
@@ -61,10 +60,4 @@ test('oturum modu ve hareketleri plana göre kurulur', () => {
   expect(s.mode).toBe('travel');
   expect(s.exercises.map((e) => e.exerciseId)[0]).toBe('band-seated-row');
   expect(createSession('A', '2026-11-24', settings, {}).mode).toBe('home');
-});
-
-test('planın kasları gerçek hareketlerden gelir', () => {
-  const m = planMuscles('A', { mode: 'travel', hasPullupBar: false });
-  expect(m.primary).toContain('lats');
-  expect(m.primary).toContain('upperBack');
 });

@@ -6,7 +6,7 @@ import { SetBox, SetStepper } from '../components/SetInput';
 import * as repo from '../data/repo';
 import { EXERCISES } from '../domain/catalog';
 import { formatDay, localDateKey } from '../domain/dates';
-import { finishStats, planMuscles, plannedSessionMuscles, sessionMuscles } from '../domain/muscles';
+import { finishStats, sessionMuscles } from '../domain/muscles';
 import { buildLadder, clampLevel, nextDay, planExercises, repRange, setsFor } from '../domain/program';
 import { chooseLevel, createSession, finishSession, hasAnySet, setRep, type FinishResult } from '../domain/session';
 import type { DayKey, ExerciseState, Session, SessionExercise, Settings, WorkoutMode } from '../domain/types';
@@ -19,7 +19,7 @@ interface Props {
   onSessionChange?: () => void;
 }
 
-type Idle = { states: Record<string, ExerciseState>; next: DayKey; recent: Session[] };
+type Idle = { states: Record<string, ExerciseState>; next: DayKey; recent: Session[]; completed: number };
 type View =
   | { kind: 'loading' }
   | { kind: 'idle'; data: Idle }
@@ -45,7 +45,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
 
   const loadIdle = useCallback(async (): Promise<Idle> => {
     const [states, last, done] = await Promise.all([repo.getExerciseStates(), repo.lastFinishedDay(), repo.listSessions()]);
-    return { states, next: nextDay(last), recent: done.slice(0, 5) };
+    return { states, next: nextDay(last), recent: done.slice(0, 5), completed: done.length };
   }, []);
 
   const showSession = (s: Session) => {
@@ -146,12 +146,6 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
           <h1>{`Antrenman ${session.day}${session.mode === 'travel' ? ' · Seyahat' : ''}`}</h1>
           <button type="button" className="btn btn-primary" disabled={busy || !hasAnySet(session)} onClick={finish}>Bitir</button>
         </header>
-        <section className="card hero">
-          <h2>Bugün çalışacak kasların 🔥</h2>
-          <p className="hero-sub">{`${session.exercises.length} hareket · tüm vücut`}</p>
-          <BodyMap muscles={plannedSessionMuscles(session)} size={190} tone="onDark" />
-          <MuscleChips muscles={plannedSessionMuscles(session)} showSecondary={false} />
-        </section>
         {session.exercises.map((e) => (
           <ExerciseCard key={e.exerciseId} entry={e} settings={settings}
             onPick={(level) => apply((s) => chooseLevel(s, e.exerciseId, level, settings))}
@@ -170,7 +164,7 @@ export default function Workout({ settings, autoStart, onSessionChange }: Props)
   return (
     <main className="screen">
       <header className="screen-header"><h1>Antrenman</h1></header>
-      <NextWorkoutCard muscles={planMuscles(data.next, homePlan)} title={`Sıradaki: Antrenman ${data.next}`}
+      <NextWorkoutCard completed={data.completed} title={`Sıradaki: Antrenman ${data.next}`}
         subtitle={`${planExercises(data.next, homePlan).length} hareket · yaklaşık 50–55 dakika`}
         actionLabel="Başla" onAction={() => start('home')}
         secondary={{ label: 'Seyahatte başla', onAction: () => start('travel') }} disabled={busy} />
@@ -257,12 +251,17 @@ function ExerciseCard({ entry, settings, onPick, onSet }: CardProps) {
 
   return (
     <section className="card ex-card">
-      <div className="ex-head">
-        <h2>{ex.name}</h2>
-        <button type="button" className="icon-btn" aria-label={`${ex.name} nasıl yapılır`} aria-expanded={showHow}
-          onClick={() => setShowHow(!showHow)}>ⓘ</button>
+      <div className="ex-top">
+        <div className="grow">
+          <div className="ex-head">
+            <h2>{ex.name}</h2>
+            <button type="button" className="icon-btn" aria-label={`${ex.name} nasıl yapılır`} aria-expanded={showHow}
+              onClick={() => setShowHow(!showHow)}>ⓘ</button>
+          </div>
+          <MuscleChips muscles={ex.muscles} />
+        </div>
+        <div className="ex-map"><BodyMap muscles={ex.muscles} size={84} /></div>
       </div>
-      <MuscleChips muscles={ex.muscles} />
       {showHow && <p className="howto">{ex.howTo}</p>}
       {unset ? picker('Başlangıç seviyeni seç') : (
         <>

@@ -37,6 +37,10 @@ Her hareketin bir tekrar aralığı var. Barfikste bu 4–8, günün sonundaki y
 - Aynı seviyede üst üste 2 antrenmanda alt sınırın altında kalırsan bir seviye geri inersin.
 - Squat ve omuz press'te en ağır bant da kolaylaşınca koç tek bacak squat ve pike şınav gibi merdiven varyasyonlarına geçer.
 
+### Kaslı dostun
+
+Sıradaki antrenman kartındaki karakter, tamamladığın antrenmanlarla büyür. Her 3 antrenmanda bir seviye atlar, en fazla 10. seviyeye çıkar. Seviye 1–3'te tombul, 4–5'te fit, 6–10'da kaslıdır. Antrenman kaçırırsan küçülmez. Her hareketin kartındaki küçük figürde o hareketin çalıştırdığı kaslar kırmızı yanar.
+
 ### Barfiks barı yoksa ve seyahatte
 
 - **Barfiks barı:** Ayarlar (⚙) → Program → **Barfiks barım var**. Kapalıyken (varsayılan) barfiksin yerine **bantlı eğilerek row** yapılır. Barı kurunca aç; barfiks kaldığı seviyeden devam eder.

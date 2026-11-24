@@ -177,13 +177,15 @@ test('Bitir\'e art arda iki dokunuş ilerlemeyi bir kez uygular', async () => {
 });
 
 describe('kas haritası', () => {
-  test('aktif antrenmanda günün kas haritası ve hareket sayısı gösterilir', async () => {
+  test('antrenman başında gün haritası yok; her hareketin kendi küçük kas figürü var', async () => {
     await repo.saveSession(active());
     render(<Workout settings={settings} />);
-    const hero = (await screen.findByRole('heading', { name: 'Bugün çalışacak kasların 🔥' })).closest('section')!;
-    expect(within(hero).getByText('2 hareket · tüm vücut')).toBeInTheDocument();
-    expect(within(hero).getByRole('img', { name: /^Arka: .*Kanat/ })).toBeInTheDocument();
-    expect(within(hero).getByRole('img', { name: /^Ön: .*Göğüs/ })).toBeInTheDocument();
+    const card = (await screen.findByRole('heading', { name: 'Barfiks' })).closest('section')!;
+    expect(screen.queryByRole('heading', { name: /Bugün çalışacak kasların/ })).not.toBeInTheDocument();
+    expect(within(card).getByRole('img', { name: 'Arka: Kanat, Üst sırt, Arka omuz, Ön kol' })).toBeInTheDocument();
+    expect(within(card).getByRole('img', { name: 'Ön: Biceps, Ön kol' })).toBeInTheDocument();
+    const pushup = screen.getByRole('heading', { name: 'Şınav' }).closest('section')!;
+    expect(within(pushup).getByRole('img', { name: 'Ön: Göğüs, Omuz, Karın' })).toBeInTheDocument();
   });
 
   test('her hareket kartında çalışan kas etiketleri var', async () => {
@@ -222,10 +224,14 @@ describe('kas haritası', () => {
     expect(await screen.findByText('3 set · Aynı hedeflerle devam')).toBeInTheDocument();
   });
 
-  test('bekleme ekranındaki "Sıradaki" kartında günün kas figürü var', async () => {
+  test('bekleme ekranındaki "Sıradaki" kartında kaslı dost ve seviyesi var', async () => {
+    for (let i = 0; i < 4; i++) await repo.saveSession({ ...active(), date: `2026-11-1${i}`, status: 'done' });
     render(<Workout settings={settings} />);
-    const card = (await screen.findByText('Sıradaki: Antrenman A')).closest('section')!;
-    expect(within(card).getByRole('img', { name: /^Ön:/ })).toBeInTheDocument();
+    // Son biten A olduğu için sıradaki B.
+    const card = (await screen.findByText('Sıradaki: Antrenman B')).closest('section')!;
+    expect(within(card).getByRole('img', { name: 'Kaslı dostun, seviye 2, tombul' })).toBeInTheDocument();
+    expect(within(card).getByText('4 antrenman tamamladın 💪')).toBeInTheDocument();
+    expect(within(card).getByText('Sonraki seviyeye 2 antrenman')).toBeInTheDocument();
     expect(within(card).getByRole('button', { name: 'Başla' })).toBeInTheDocument();
   });
 });
@@ -273,12 +279,11 @@ describe('seyahat modu ve barsız program', () => {
     expect(await screen.findByRole('heading', { name: 'Antrenman A · Seyahat' })).toBeInTheDocument();
   });
 
-  test('seyahat oturumunun kas haritası gerçek hareketlerden çizilir', async () => {
+  test('seyahat hareketinin kartında kendi kas figürü var', async () => {
     const user = userEvent.setup();
     render(<Workout settings={settings} />);
     await user.click(await screen.findByRole('button', { name: 'Seyahatte başla' }));
-    const hero = (await screen.findByRole('heading', { name: 'Bugün çalışacak kasların 🔥' })).closest('section')!;
-    // Bantlı eğilerek row'un ana kası üst sırt; ev A gününde üst sırt ana değildir.
-    expect(within(within(hero).getByRole('list', { name: 'Çalışan kaslar' })).getByText('Üst sırt')).toBeInTheDocument();
+    const card = (await screen.findByRole('heading', { name: 'Bantlı eğilerek row' })).closest('section')!;
+    expect(within(card).getByRole('img', { name: /^Arka: Kanat, Üst sırt/ })).toBeInTheDocument();
   });
 });

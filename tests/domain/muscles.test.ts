@@ -1,6 +1,6 @@
 import { EXERCISES } from '../../src/domain/catalog';
 import {
-  MUSCLE_NAMES, FRONT_MUSCLES, BACK_MUSCLES, mergeMuscles, dayMuscles, sessionMuscles, finishStats,
+  MUSCLE_NAMES, FRONT_MUSCLES, BACK_MUSCLES, mergeMuscles, sessionMuscles, finishStats,
 } from '../../src/domain/muscles';
 import type { Session } from '../../src/domain/types';
 
@@ -39,12 +39,6 @@ test('mergeMuscles birleştirir; yardımcıdan ana kası çıkarır; ilk geçiş
     { primary: ['chest'], secondary: ['shoulders', 'triceps'] },
     { primary: ['triceps'], secondary: ['shoulders'] },
   ])).toEqual({ primary: ['chest', 'triceps'], secondary: ['shoulders'] });
-});
-
-test('A gününün kasları', () => {
-  const a = dayMuscles('A');
-  expect(a.primary).toEqual(['lats', 'biceps', 'chest', 'triceps', 'quads', 'glutes', 'hamstrings', 'abs', 'shoulders']);
-  for (const m of a.secondary) expect(a.primary).not.toContain(m);
 });
 
 const sess = (exercises: Session['exercises']): Session => ({ date: '2026-11-23', day: 'A', status: 'done', exercises });

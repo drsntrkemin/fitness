@@ -306,3 +306,19 @@ select {
 .btn-hero-outline { background: transparent; color: #fff; border: 1.5px solid rgb(255 255 255 / 0.6); margin-top: 8px; }
 .toggle-row { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 12px; font-weight: 600; cursor: pointer; }
 .toggle-row input { width: 22px; height: 22px; accent-color: var(--accent); }
+
+/* ── Kaslı dost + hareket kas figürü (kırmızı) ── */
+:root { --muscle-p: #ef4444; --muscle-s: #fca5a5; }
+.muscle-chips .chip-p { background: #fee2e2; color: #b91c1c; }
+@media (prefers-color-scheme: dark) { .muscle-chips .chip-p { background: #450a0a; color: #fca5a5; } }
+.ex-top { display: flex; gap: 10px; align-items: flex-start; }
+.ex-map { flex-shrink: 0; background: var(--bg); border-radius: 12px; padding: 6px 4px; }
+.ex-map .bodymap { gap: 2px; }
+.next-workout h2 { margin-bottom: 2px; }
+.buddy-row { display: flex; align-items: center; gap: 12px; margin: 6px 0 4px; }
+.buddy { flex-shrink: 0; }
+.buddy-info p { margin: 0; }
+.buddy-title { font-weight: 800; font-size: 1.02rem; }
+.buddy-bar { height: 8px; background: rgb(255 255 255 / 0.22); border-radius: 4px; overflow: hidden; margin: 6px 0 4px; }
+.buddy-bar > div { height: 100%; background: #fde047; border-radius: 4px; transition: width 0.4s ease; }
+.hero-sub { color: #e0f2ef; }
